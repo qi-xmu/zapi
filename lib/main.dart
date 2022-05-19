@@ -1,9 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:zapi/component/api_widget.dart';
 import 'api.dart';
-
-import 'package:flutter_logs/flutter_logs.dart';
 
 // Future<void> main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'ZAPI',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -44,9 +43,9 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'ZAPI'),
     );
   }
 }
@@ -83,11 +82,26 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     API test = API("http://api.xmu-maker.cn:2233");
-    var res = await test.send(HttpMethod.GET, "/", {});
+    var res = await test.send(HttpMethod.GET, "/");
     log(res.toString());
-    res = await test.send(HttpMethod.GET, "/temp", {});
+    res = await test.send(HttpMethod.GET, "/temp");
     log(res.toString());
   }
+
+  ApiGroup group = ApiGroup("http://api.xmu-maker.cn:2233");
+
+  List<APIInfo> apiList = [
+    APIInfo(1, "按键", HttpMethod.GET, ""),
+    APIInfo(2, "信息", HttpMethod.GET, "/temp"),
+    APIInfo(3, "滑动", HttpMethod.GET, "/"),
+    APIInfo(4, "开关", HttpMethod.GET, "/"),
+  ];
+  late List<ApiWidgetInfo> infoList = [
+    ApiWidgetInfo(ApiWidgetType.BUTTON, group, apiList[0], controlParam: "", options: ["/0", "/1"]),
+    ApiWidgetInfo(ApiWidgetType.INFO, group, apiList[1], controlParam: "state", options: ["info"]),
+    ApiWidgetInfo(ApiWidgetType.SLIDING, group, apiList[2], controlParam: "state", options: [0.1, 1]),
+    ApiWidgetInfo(ApiWidgetType.SWITCH, group, apiList[3], controlParam: "state", options: ["off", "on"]),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -106,32 +120,11 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+        child: ListView.builder(
+            itemCount: infoList.length,
+            itemBuilder: (BuildContext context, int i) {
+              return ApiWidget(info: infoList[i]);
+            }),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
