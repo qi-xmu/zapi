@@ -1,5 +1,27 @@
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import 'api.dart';
+
+import 'package:flutter_logs/flutter_logs.dart';
+
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+
+//   //Initialize Logging
+//   await FlutterLogs.initLogs(
+//       logLevelsEnabled: [LogLevel.INFO, LogLevel.WARNING, LogLevel.ERROR, LogLevel.SEVERE],
+//       timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+//       directoryStructure: DirectoryStructure.FOR_DATE,
+//       logTypesEnabled: ["device", "network", "errors"],
+//       logFileExtension: LogFileExtension.LOG,
+//       logsWriteDirectoryName: "MyLogs",
+//       logsExportDirectoryName: "MyLogs/Exported",
+//       debugFileOperations: true,
+//       isDebuggable: true);
+
+//   runApp(const MyApp());
+// }
 void main() {
   runApp(const MyApp());
 }
@@ -50,7 +72,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -59,6 +81,12 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+
+    API test = API("http://api.xmu-maker.cn:2233");
+    var res = await test.send(HttpMethod.GET, "/", {});
+    log(res.toString());
+    res = await test.send(HttpMethod.GET, "/temp", {});
+    log(res.toString());
   }
 
   @override
