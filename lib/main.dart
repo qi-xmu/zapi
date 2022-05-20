@@ -92,15 +92,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<APIInfo> apiList = [
     APIInfo(1, "按键", HttpMethod.GET, ""),
-    APIInfo(2, "信息", HttpMethod.GET, "/temp"),
-    APIInfo(3, "滑动", HttpMethod.GET, "/"),
+    APIInfo(2, "信息", HttpMethod.GET, "/info"),
+    APIInfo(3, "滑动", HttpMethod.POST, "/controll"),
     APIInfo(4, "开关", HttpMethod.GET, "/"),
+    APIInfo(5, "按键", HttpMethod.GET, ""),
   ];
   late List<ApiWidgetInfo> infoList = [
-    ApiWidgetInfo(ApiWidgetType.BUTTON, group, apiList[0], controlParam: "", options: ["/0", "/1"]),
+    ApiWidgetInfo(ApiWidgetType.BUTTON, group, apiList[4], options: ["/0"]),
+    ApiWidgetInfo(ApiWidgetType.BUTTON, group, apiList[0], options: ["/1"]),
     ApiWidgetInfo(ApiWidgetType.INFO, group, apiList[1], controlParam: "state", options: ["info"]),
-    ApiWidgetInfo(ApiWidgetType.SLIDING, group, apiList[2], controlParam: "state", options: [0.1, 1]),
-    ApiWidgetInfo(ApiWidgetType.SWITCH, group, apiList[3], controlParam: "state", options: ["off", "on"]),
+    ApiWidgetInfo(ApiWidgetType.SLIDING, group, apiList[2], controlParam: "action", options: [0.1, 100]),
+    ApiWidgetInfo(ApiWidgetType.SWITCH, group, apiList[3], controlParam: "state", options: ["on", "off"]),
   ];
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:zapi/api.dart';
 import 'package:flutter/material.dart';
 import 'package:zapi/standard.dart';
@@ -33,9 +34,7 @@ class ApiWidgetInfo {
   Map<String, dynamic>? genParam(dynamic state) {
     switch (type) {
       case ApiWidgetType.BUTTON:
-        int index = state ? 0 : 1;
-        assert(options!.length > index);
-        dynamic option = options![index];
+        dynamic option = options![0];
         apiInfo.path = option;
         break;
       case ApiWidgetType.SWITCH:
@@ -46,12 +45,9 @@ class ApiWidgetInfo {
         return {controlParam ?? "": option};
       case ApiWidgetType.SLIDING:
         // DOING: Handle this case. 1~100 == min~max
-        num min = options?[0];
-        num max = options?[1];
-        num val = min + state * (max - min);
 
         if (controlParam == null) return {};
-        return {controlParam ?? "": val.toStringAsFixed(3)};
+        return {controlParam ?? "": state.toStringAsFixed(3)};
 
       case ApiWidgetType.INFO:
         // TODO: Handle this case.
@@ -61,15 +57,16 @@ class ApiWidgetInfo {
     return {};
   }
 
-  void action({
+  Future<Response?> action({
     Map<String, dynamic>? params,
     Map<String, dynamic>? headers,
   }) async {
     API api = API(group.url, params: apiInfo.params, headers: apiInfo.headers); // 默认参数
     api.setParams(params); // 设置自定义参数
     api.setParams(headers); // 设置自定义头部
-    var res = await api.send(apiInfo.method, apiInfo.path);
-    log(res.toString());
+    Response? res = await api.send(apiInfo.method, apiInfo.path);
+    // log(res.toString());
+    return res;
   }
 }
 
@@ -106,30 +103,33 @@ class ButtonWidget extends StatefulWidget {
 }
 
 class _ButtonWidget extends State<ButtonWidget> {
-  late bool state = false;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
         // TODO ButtonWidget 点击动作
-        onTap: () {
-          setState(() {
-            state = !state;
-          });
-          widget.info.genParam(state);
-          widget.info.action();
-        },
+        onTap: () {},
         child: Container(
-          margin: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin),
-          padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
-          decoration: BoxDecoration(
-            color: state ? Colors.blue : Colors.green,
-            border: Border.all(width: 1, color: Colors.black),
-          ),
-          constraints: const BoxConstraints(minHeight: minHeight),
-          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text("${widget.info.apiInfo.name}\t$state"),
-          ]),
-        ));
+            margin: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin),
+            // padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.black),
+            ),
+            constraints: const BoxConstraints(minHeight: minHeight),
+            child: ListTile(
+              title: Text(widget.info.apiInfo.name),
+              subtitle: Text(widget.info.options?[0]),
+              onTap: () async {
+                widget.info.genParam(0); // 生成参数
+                // Load start
+                var res = await widget.info.action(); // 发送信息
+                // Load end
+                if (res == null || res.statusCode! >= 400) {
+                  // TODO 网络错误 || 参数错误
+                } else {
+                  //TODO 请求成功
+                }
+              },
+            )));
   }
 }
 
@@ -144,16 +144,43 @@ class InfoWidget extends StatefulWidget {
 }
 
 class _InfoWidget extends State<InfoWidget> {
+  Map<String, dynamic>? info;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin),
-      padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
-      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.black)),
-      constraints: const BoxConstraints(minHeight: minHeight),
-      child: Row(children: [
-        Text(widget.info.apiInfo.name),
-      ]),
+    // 生成info的list:
+    List<Widget> infoWidgetList = [];
+    info?.forEach((key, value) {
+      infoWidgetList.add(Text("$key\t$value"));
+    });
+    return GestureDetector(
+      onTap: () async {
+        // widget.info.genParam(state); // 生成参数
+        // Load start
+        var res = await widget.info.action(); // 发送信息
+        // Load end
+        if (res == null || res.statusCode! >= 400) {
+          // TODO 网络错误 || 参数错误
+        } else {
+          setState(() {
+            info = res.data;
+          });
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin),
+        padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
+        decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.black)),
+        constraints: const BoxConstraints(minHeight: minHeight),
+        child: Column(children: [
+          Text(widget.info.apiInfo.name),
+          Divider(),
+          SizedBox(
+              height: 100,
+              child: ListView(
+                children: infoWidgetList,
+              ))
+        ]),
+      ),
     );
   }
 }
@@ -169,7 +196,8 @@ class SlidingWidget extends StatefulWidget {
 }
 
 class _SlidingWidget extends State<SlidingWidget> {
-  double state = 0;
+  double percent = 0; // 记录比例
+  num value = 0; // 记录值
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -178,20 +206,32 @@ class _SlidingWidget extends State<SlidingWidget> {
       decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.black)),
       constraints: const BoxConstraints(minHeight: minHeight),
       child: Column(children: [
-        Text("${widget.info.apiInfo.name}\t${state.toStringAsFixed(3)}"),
+        Text(widget.info.apiInfo.name),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("${widget.info.options?[0]}"),
+            Text("${(percent * 100).toStringAsFixed(2)}% / ${value.toStringAsFixed(3)}"),
+            Text("${widget.info.options?[1]}"),
+          ],
+        ),
         Slider(
-          value: state,
-          max: 1.0,
-          onChanged: (double val) {
-            setState(() {
-              this.state = val;
-            });
-          },
-          onChangeEnd: (double val) {
-            var param = widget.info.genParam(state);
-            widget.info.action(params: param);
-          },
-        )
+            value: percent,
+            label: "ce",
+            max: 1.0,
+            onChanged: (double percent) {
+              num min = widget.info.options?[0];
+              num max = widget.info.options?[1];
+              num value = min + percent * (max - min);
+              setState(() {
+                this.value = value;
+                this.percent = percent;
+              });
+            },
+            onChangeEnd: (double state) {
+              var param = widget.info.genParam(value); // 生成参数简化
+              var res = widget.info.action(params: param); // 发送信息
+            }),
       ]),
     );
   }
@@ -218,15 +258,23 @@ class _SwitchWidget extends State<SwitchWidget> {
       decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.black)),
       constraints: const BoxConstraints(minHeight: minHeight),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(widget.info.apiInfo.name + "\t${state}"),
+        Text("${widget.info.apiInfo.name}\t$state"),
         Switch(
             value: state,
-            onChanged: (bool state) {
-              setState(() {
-                this.state = state;
-              });
+            onChanged: (bool state) async {
+              // Loading
               var param = widget.info.genParam(state);
-              widget.info.action(params: param);
+              var res = await widget.info.action(params: param);
+              // Load end
+              if (res == null || res.statusCode! >= 400) {
+                // TODO 网络错误 || 参数错误
+
+              } else {
+                // 更新状态
+                setState(() {
+                  this.state = state;
+                });
+              }
             })
       ]),
     );

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 
 enum HttpMethod { GET, POST, PUT, DELETE, PATCH }
 
@@ -60,7 +61,7 @@ class API {
   }
 
   /// 参数位请求方式和请求参数。
-  Future<Object> send(HttpMethod method, String path) async {
+  Future<Response?> send(HttpMethod method, String path) async {
     Response response;
     path = url + path;
     log("$path\t$_params");
@@ -82,9 +83,12 @@ class API {
           response = await Dio().patch(path, queryParameters: _params, options: Options(headers: _headers));
           break;
       }
-    } on Exception catch (e) {
-      log(e.toString());
-      return e;
+    } on DioError catch (e) {
+      if (e.response != null)
+        log(e.response!.statusCode.toString(), level: LogLevel.ERROR.index, error: e.response!.statusMessage);
+      else
+        log("", level: LogLevel.ERROR.index, error: "Network or Server Error");
+      return e.response;
     }
     return response;
   }
