@@ -1,26 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:zapi/component/api_widget.dart';
+import 'package:zapi/components/api_widget.dart';
+import 'package:zapi/modal/modal.dart'; // 弹窗
 import 'api.dart';
 
-// Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-
-//   //Initialize Logging
-//   await FlutterLogs.initLogs(
-//       logLevelsEnabled: [LogLevel.INFO, LogLevel.WARNING, LogLevel.ERROR, LogLevel.SEVERE],
-//       timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-//       directoryStructure: DirectoryStructure.FOR_DATE,
-//       logTypesEnabled: ["device", "network", "errors"],
-//       logFileExtension: LogFileExtension.LOG,
-//       logsWriteDirectoryName: "MyLogs",
-//       logsExportDirectoryName: "MyLogs/Exported",
-//       debugFileOperations: true,
-//       isDebuggable: true);
-
-//   runApp(const MyApp());
-// }
 void main() {
   runApp(const MyApp());
 }
@@ -129,7 +113,9 @@ class _MyHomePageState extends State<MyHomePage> {
             }),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {
+          testModal(context);
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

@@ -1,8 +1,8 @@
 import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:zapi/api.dart';
 import 'package:flutter/material.dart';
+import 'package:zapi/modal/modal.dart';
 import 'package:zapi/standard.dart';
 
 /// TODO enum 这里可以新增类型
@@ -45,7 +45,6 @@ class ApiWidgetInfo {
         return {controlParam ?? "": option};
       case ApiWidgetType.SLIDING:
         // DOING: Handle this case. 1~100 == min~max
-
         if (controlParam == null) return {};
         return {controlParam ?? "": state.toStringAsFixed(3)};
 
@@ -106,8 +105,6 @@ class _ButtonWidget extends State<ButtonWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        // TODO ButtonWidget 点击动作
-        onTap: () {},
         child: Container(
             margin: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin),
             // padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
@@ -118,6 +115,7 @@ class _ButtonWidget extends State<ButtonWidget> {
             child: ListTile(
               title: Text(widget.info.apiInfo.name),
               subtitle: Text(widget.info.options?[0]),
+              // TODO ButtonWidget 点击动作
               onTap: () async {
                 widget.info.genParam(0); // 生成参数
                 // Load start
@@ -125,8 +123,10 @@ class _ButtonWidget extends State<ButtonWidget> {
                 // Load end
                 if (res == null || res.statusCode! >= 400) {
                   // TODO 网络错误 || 参数错误
+                  showFailSnack(context, "网络错误 或者 参数错误");
                 } else {
                   //TODO 请求成功
+                  showSucessSnack(context, "请求成功");
                 }
               },
             )));

@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_logs/flutter_logs.dart';
 
 enum HttpMethod { GET, POST, PUT, DELETE, PATCH }
 
@@ -85,9 +84,10 @@ class API {
       }
     } on DioError catch (e) {
       if (e.response != null)
-        log(e.response!.statusCode.toString(), level: LogLevel.ERROR.index, error: e.response!.statusMessage);
-      else
-        log("", level: LogLevel.ERROR.index, error: "Network or Server Error");
+        log(e.response!.statusCode.toString(), level: 3, error: e.response!.statusMessage);
+      else {
+        log("", level: 3, error: "Network or Server Error");
+      }
       return e.response;
     }
     return response;
