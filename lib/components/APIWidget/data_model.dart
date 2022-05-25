@@ -4,10 +4,10 @@ part of api_widget;
 
 /// TODO enum 这里可以新增类型
 enum ApiWidgetType {
-  BUTTON, // 按钮
-  SWITCH, // 开关
-  SLIDING, // 滑动条
-  INFO, // 信息组件
+  BUTTON, // 按钮 0
+  SWITCH, // 开关 1
+  SLIDING, // 滑动条 2
+  INFO, // 信息组件 3
 }
 
 class ApiWidgetInfo {
@@ -82,5 +82,10 @@ class ApiWidgetInfo {
     Response? res = await api.send(apiInfo.method, apiInfo.path);
     // log(res.toString());
     return res;
+  }
+
+  @override
+  String toString() {
+    return [type, group, apiInfo, control, options, response, responseAlias].toString();
   }
 }

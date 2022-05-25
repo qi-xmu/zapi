@@ -3,16 +3,15 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:zapi/components/APIGroup/data_model.dart';
-import 'package:zapi/components/APIWidget/mod.dart';
-import 'package:zapi/forms/AddApi.dart';
-import 'package:zapi/forms/AddGroup.dart';
+
+import 'package:zapi/forms/add_api.dart';
+import 'package:zapi/forms/add_group.dart';
 import 'package:zapi/modals/mod.dart'; // 弹窗
-import 'package:zapi/pages/GroupPage.dart';
-import 'package:zapi/standard.dart';
+import 'package:zapi/pages/group_page.dart';
+import 'package:zapi/utils/standard.dart';
 import 'test.dart';
 
 void main() {
-  group.addApis(apiList);
   group.addApis(apiList);
 
   EasyLoading.instance
@@ -32,16 +31,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ZAPI',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+        primarySwatch: createMaterialColor(lightColor),
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: createMaterialColor(Colors.white70),
       ),
       home: const MyHomePage(title: 'ZAPI'),
       builder: EasyLoading.init(),
@@ -62,13 +57,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(widget.title + " API组"),
-      ),
+      appBar: AppBar(title: Text("${widget.title} API组")),
+      drawer: const Drawer(child: const SafeArea(child: SizedBox())),
       body: Center(
         child: ListView.builder(
-            padding: EdgeInsets.only(top: topPadding, bottom: bottomPadding),
+            padding: const EdgeInsets.only(top: topPadding, bottom: bottomPadding),
             itemCount: groupList.length,
             itemBuilder: (BuildContext context, int i) {
               ApiGroup group = groupList[i];

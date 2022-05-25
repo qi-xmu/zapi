@@ -15,6 +15,10 @@ class ApiGroup {
     id = DateTime.now().millisecondsSinceEpoch;
     _user = user;
   }
+  @override
+  String toString() {
+    return [id, name, url].toString();
+  }
 
   /// 修改认证
   void modifyUser(User user) {

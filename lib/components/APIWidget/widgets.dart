@@ -27,22 +27,25 @@ class ApiWidget extends StatelessWidget {
   }
 }
 
-// DONE 定义一个组件的Container
-// TODO 修改容器样式
+// DOING 修改样式 定义一个组件的Container
 /// 这里可以声明所有组件的容器样式
 Widget widgetContainer(BuildContext context, Widget widget) {
   return Container(
     margin: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin),
     padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
     decoration: BoxDecoration(
-      border: Border.all(width: 1, color: Colors.black),
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(radius),
+      boxShadow: [
+        BoxShadow(color: lightColor.withOpacity(0.1), blurRadius: 1, spreadRadius: 2),
+      ],
     ),
     constraints: const BoxConstraints(minHeight: minHeight),
     child: widget,
   );
 }
 
-/// DOING ButtonWidget
+/// TODO 各个组件的样式修改。
 /// 按键的组件
 class ButtonWidget extends StatefulWidget {
   final ApiWidgetInfo info;
@@ -58,10 +61,8 @@ class _ButtonWidget extends State<ButtonWidget> with WidgetAction {
   // 动作
   action() async {
     widget.info.genParam(0); // 生成参数
-    // Load start
     showLoading();
     var res = await widget.info.action(); // 发送信息
-    // Load end
     if (!mounted) return; // DO NOT use BuildContext across asynchronous gaps.
     if (showResult(context, res, response: widget.info.response?[0])) {}
     EasyLoading.dismiss();
@@ -74,7 +75,8 @@ class _ButtonWidget extends State<ButtonWidget> with WidgetAction {
     return widgetContainer(
       context,
       ListTile(
-        title: Text(widget.info.apiInfo.name),
+        dense: true,
+        title: TitleText(widget.info.apiInfo.name),
         subtitle: Text(widget.info.options?[0]),
         onTap: action,
       ),
@@ -82,7 +84,37 @@ class _ButtonWidget extends State<ButtonWidget> with WidgetAction {
   }
 }
 
-/// TODO InfoWidget
+class InfoGrid extends StatelessWidget {
+  final String name;
+  final dynamic value;
+  const InfoGrid({Key? key, required this.name, required this.value}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+      padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(radius),
+        boxShadow: [
+          BoxShadow(color: lightColor.withOpacity(0.05), blurRadius: 1, spreadRadius: 2),
+        ],
+      ),
+      constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+      child: Column(children: [
+        Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(
+            child: Center(
+                child: Text(
+          value.toString(),
+          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 20),
+        )))
+      ]),
+    );
+  }
+}
+
 /// 信息展示的组件
 class InfoWidget extends StatefulWidget {
   final ApiWidgetInfo info;
@@ -94,49 +126,75 @@ class InfoWidget extends StatefulWidget {
 
 class _InfoWidget extends State<InfoWidget> with WidgetAction {
   Map<String, dynamic>? info;
+  bool update = false;
   // 动作
   action() async {
-    widget.info.genParam(null); // 生成参数
     showLoading();
-
+    setState(() => update = false);
+    widget.info.genParam(null); // 生成参数
     var res = await widget.info.action(); // 发送信息
-    // Load end
-
     if (!mounted) return;
     if (showResult(context, res, response: widget.info.response![0])) {
       setState(() {
+        update = true;
         info = res!.data;
       });
     }
     loaded();
   }
 
+  @override
+  void initState() {
+    update = false;
+    initData(); // info自动加载
+    super.initState();
+  }
+
+  initData() async {
+    var res = await widget.info.action(); // 发送信息
+    if (!mounted) return;
+    if (res != null && res.statusCode! <= 400) {
+      setState(() {
+        update = true;
+        info = res.data;
+      });
+    } else {
+      showSuccBlock("数据更新失败");
+    }
+  }
+
   // 组件
   @override
   Widget build(BuildContext context) {
     // 生成info的list:
-    List<Widget> infoWidgetList = [];
+    List<Widget> widgetList = [];
     info?.forEach((key, value) {
-      infoWidgetList.add(Text("$key\t$value"));
+      widgetList.add(InfoGrid(name: key, value: value));
     });
     return widgetContainer(
       context,
       GestureDetector(
         onTap: action,
         child: Column(children: [
-          Text(widget.info.apiInfo.name),
+          // 状态栏
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            TitleText("名称：${widget.info.apiInfo.name}"),
+            Row(children: [
+              Icon(
+                update ? Icons.check : Icons.error_outline,
+                color: update ? Colors.green : Colors.red,
+              ),
+            ])
+          ]),
           const Divider(),
-          SizedBox(
-            height: 100,
-            child: ListView(children: infoWidgetList),
-          )
+          GridView.count(shrinkWrap: true, crossAxisCount: 3, children: widgetList),
+          const Divider(),
         ]),
       ),
     );
   }
 }
 
-/// TODO SlidingWidget
 /// 滑动条的组件
 class SlidingWidget extends StatefulWidget {
   final ApiWidgetInfo info;
@@ -183,19 +241,12 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
           Text("${(percent * 100).toStringAsFixed(2)}% / ${value.toStringAsFixed(3)}"),
           Text("${widget.info.options?[1]}"),
         ]),
-        Slider(
-          value: percent,
-          label: "ce",
-          max: 1.0,
-          onChanged: onChangedAction,
-          onChangeEnd: action,
-        ),
+        Slider(value: percent, max: 1.0, onChanged: onChangedAction, onChangeEnd: action),
       ]),
     );
   }
 }
 
-/// TODO SwitchWidget
 /// 开关的组件
 ///
 class SwitchWidget extends StatefulWidget {

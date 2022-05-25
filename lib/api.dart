@@ -22,6 +22,11 @@ class APIInfo {
     this.params,
     this.headers,
   });
+
+  @override
+  String toString() {
+    return [id, name, method, path, params, headers].toString();
+  }
 }
 
 /// DONE API 待完善
@@ -83,9 +88,9 @@ class API {
           break;
       }
     } on DioError catch (e) {
-      if (e.response != null)
+      if (e.response != null) {
         log(e.response!.statusCode.toString(), level: 3, error: e.response!.statusMessage);
-      else {
+      } else {
         log("", level: 3, error: "Network or Server Error");
       }
       return e.response;

@@ -36,7 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   dio: ^4.0.6
   flutter_easyloading: ^3.0.5
-
+  select_form_field: ^2.2.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
