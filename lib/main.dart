@@ -1,17 +1,16 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:zapi/components/APIGroup/data_model.dart';
+import 'package:zapi/components/DataStorage/mod.dart';
 
-import 'package:zapi/forms/add_api.dart';
 import 'package:zapi/forms/add_group.dart';
-import 'package:zapi/modals/mod.dart'; // 弹窗
 import 'package:zapi/pages/group_page.dart';
 import 'package:zapi/utils/standard.dart';
 import 'test.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  initPrefs(); // 初始化存储实例
   group.addApis(apiList);
 
   EasyLoading.instance

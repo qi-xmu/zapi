@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 
-const double verMargin = 5;
-const double horMargin = 15;
-const double verPadding = 5;
-const double horPadding = 10;
+/// 存放一些设计标准。
 
-const double minHeight = 60;
+const double verMargin = 15;
+const double horMargin = 5;
+const double verPadding = 5;
+const double horPadding = 5;
+
+const double boxSize = 85;
 
 const double topPadding = 10;
 const double bottomPadding = 100;
 
 const double radius = 10;
 
-const Color lightColor = Colors.black54;
-const Color dartColor = Colors.white70;
+const Color lightColor = Colors.black87;
+const Color darkColor = Colors.white70;
 
 /* 生成色彩 */
 MaterialColor createMaterialColor(Color color) {

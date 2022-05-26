@@ -1,4 +1,4 @@
-import 'package:zapi/api.dart';
+import 'package:zapi/components/API/data_model.dart';
 import 'package:zapi/components/APIWidget/mod.dart';
 
 /// DOING APIGroup
@@ -8,12 +8,14 @@ class ApiGroup {
   late int id; // 组的id用于数据库的识别
   String name;
   String url;
-  User? _user; // 用户
-  late List<ApiWidgetInfo> apiList;
+  // User? _user; // 用户
+  List<dynamic> widgetList = [];
+  // List<ApiWidgetInfo> switchList = [];
+  // List<ApiWidgetInfo> buttonList = [];
   ApiGroup(this.name, this.url, {User? user}) {
-    apiList = [];
     id = DateTime.now().millisecondsSinceEpoch;
-    _user = user;
+    // widgetList.add(switchList);
+    // widgetList.add(buttonList);
   }
   @override
   String toString() {
@@ -21,17 +23,16 @@ class ApiGroup {
   }
 
   /// 修改认证
-  void modifyUser(User user) {
-    _user = user;
-  }
+  void modifyUser(User user) {}
 
   /// 添加新的api接口
   void addApi(ApiWidgetInfo api) {
-    // api.token = _user?.token ?? ""; // 添加认证
-    apiList.add(api);
+    widgetList.add(api);
   }
 
-  void addApis(List<ApiWidgetInfo> api) {
-    apiList.addAll(api);
+  void addApis(List<ApiWidgetInfo> apis) {
+    for (var api in apis) {
+      addApi(api);
+    }
   }
 }

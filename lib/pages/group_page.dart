@@ -1,8 +1,9 @@
+/// 数据组的界面。
+///
 import 'package:flutter/material.dart';
 import 'package:zapi/components/APIGroup/data_model.dart';
 import 'package:zapi/components/APIWidget/mod.dart';
 import 'package:zapi/forms/add_api.dart';
-import 'package:zapi/test.dart';
 
 import 'package:zapi/utils/standard.dart';
 
@@ -17,18 +18,22 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   @override
   Widget build(BuildContext context) {
+    List<Widget> widgetList = [];
+    for (var element in widget.group.widgetList) {
+      widgetList.add(ApiWidget(info: element));
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.group.name),
       ),
-      body: Center(
-        child: ListView.builder(
-            padding: const EdgeInsets.only(top: topPadding, bottom: bottomPadding),
-            itemCount: widget.group.apiList.length,
-            itemBuilder: (BuildContext context, int i) {
-              return ApiWidget(info: widget.group.apiList[i]);
-            }),
-      ),
+      body: SingleChildScrollView(
+          // padding: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin),
+          padding: const EdgeInsets.only(top: topPadding, bottom: boxSize, left: verMargin, right: verMargin),
+          child: Wrap(
+            runSpacing: 10, // vertical
+            spacing: 10, // horizontal
+            children: widgetList,
+          )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context)

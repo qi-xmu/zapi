@@ -2,15 +2,16 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 
+// ignore: constant_identifier_names
 enum HttpMethod { GET, POST, PUT, DELETE, PATCH }
 
 /// DOING APIINFO
-/// api信息的抽象。
+/// api信息的抽象。api组件包含api info的内容。
 class APIInfo {
   int id;
-  String name;
-  HttpMethod method;
-  String path;
+  String name; // 名字
+  String path; // 路径
+  HttpMethod method; // 方法
   Map<String, dynamic>? params; // 路径参数
   Map<String, dynamic>? headers; // 头部
 
@@ -31,6 +32,7 @@ class APIInfo {
 
 /// DONE API 待完善
 /// @brief 每一个API对应一个环境，包含多个接口。用于发起请求
+/// 一个api组包含一个通用的api抽象。主要用于身份的认证和简化url。
 class API {
   String url;
   Map<String, dynamic>? _headers;
@@ -43,12 +45,12 @@ class API {
   }
 
   /// TODO token储存
-  /// 设置token
+  /// 设置token，一个组别一个用户用于api身份的认证。
   set token(String token) {
     _headers?["token"] = token;
   }
 
-  /// 自定义头部
+  /// 自定义头部，为一个组别添加一些自定义参数。
   void setHeader(Map<String, dynamic>? newHeaders) {
     newHeaders = newHeaders ?? {};
     newHeaders.forEach((key, value) {
@@ -56,7 +58,7 @@ class API {
     });
   }
 
-  /// 自定义参数
+  /// 自定义参数，为一个组别添加一些自定义参数。
   void setParams(Map<String, dynamic>? newParams) {
     newParams = newParams ?? {};
     newParams.forEach((key, value) {
@@ -99,7 +101,7 @@ class API {
   }
 }
 
-/// TODO 登录功能 暂时不做
+// TODO 登录功能 暂时不做
 /// 可选用户认证
 class User {
   late String token;
@@ -110,15 +112,11 @@ class User {
     _passwd = passwd;
   }
 
-  get name {
-    return _username;
-  }
+  get name => _username;
 
   /// 登录
   void login() {
     // TODO 登录 get token and store token;
-    _username;
-    _passwd;
   }
 
   /// 获取token

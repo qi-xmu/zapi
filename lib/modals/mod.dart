@@ -6,4 +6,4 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 part 'data_model.dart';
 part './widgets.dart';
 
-part './methods.dart';
+part 'actions.dart';
