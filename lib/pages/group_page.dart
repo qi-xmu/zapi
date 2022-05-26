@@ -21,13 +21,11 @@ class _GroupListState extends State<GroupList> {
   @override
   Widget build(BuildContext context) {
     List<Widget> widgetList = [];
-    for (var element in widget.group.widgetList) {
-      widgetList.add(ApiWidget(info: element));
+    for (var awi in widget.group.widgetList) {
+      widgetList.add(ApiWidget(info: awi));
     }
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.group.name),
-      ),
+      appBar: AppBar(title: Text(widget.group.name)),
       body: SingleChildScrollView(
           // padding: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin),
           padding: const EdgeInsets.only(top: topPadding, bottom: boxSize, left: verMargin, right: verMargin),
@@ -73,7 +71,7 @@ class _GroupListState extends State<GroupList> {
           label: '添加信息展示',
           onTap: () {
             Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => AddButtonForm(group: widget.group)))
+                .push(MaterialPageRoute(builder: (context) => AddInfoForm(group: widget.group)))
                 .then((value) => {setState(() {})});
           },
         ),

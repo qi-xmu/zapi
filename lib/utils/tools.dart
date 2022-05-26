@@ -5,10 +5,10 @@ bool isDarkMode(BuildContext context) {
   return Theme.of(context).brightness == Brightness.dark;
 }
 
-List<String> getNameList(List<ApiGroup> groups) {
+List<String> getIDList(List<ApiGroup> groups) {
   List<String> res = [];
   for (ApiGroup group in groups) {
-    res.add(group.name);
+    res.add(group.id.toString());
   }
   return res;
 }

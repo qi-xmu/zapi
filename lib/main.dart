@@ -6,11 +6,12 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:zapi/components/APIGroup/data_model.dart';
 import 'package:zapi/components/DataStorage/mod.dart';
 
-import 'package:zapi/forms/add_group.dart';
+import 'package:zapi/forms/group_form.dart';
 import 'package:zapi/pages/group_page.dart';
+import 'package:zapi/test.dart';
 import 'package:zapi/utils/ext_widgets.dart';
 import 'package:zapi/utils/standard.dart';
-import 'test.dart';
+import 'components/Menu/mod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,32 +19,26 @@ void main() async {
   /// TESTING
   // prefs.clear();
 
-  group.addApis(apiList);
-  await prefs.setString(group.name, jsonEncode(group));
+  // testGroup.addApis(apiList);
+  // await prefs.setString(testGroup.id.toString(), jsonEncode(testGroup));
 
-  await prefs.setStringList(GroupListKey, [group.name]);
+  // await prefs.setStringList(GroupListKey, [testGroup.id.toString()]);
   print(prefs.getKeys());
+
+  ///TESING end
+
   // 加载group列表 groupList
-  List<String>? groupNameList = prefs.getStringList(GroupListKey);
-  for (String group in groupNameList!) {
-    String? groupStr = prefs.getString(group);
+  List<String>? groupIDList = prefs.getStringList(GroupListKey);
+  for (String id in groupIDList!) {
+    String? groupStr = prefs.getString(id);
+    // log(groupStr.toString());
     if (groupStr == null) continue;
     try {
-      var test = jsonDecode(groupStr);
-      groupList.add(ApiGroup.fromJson(test));
+      groupList.add(ApiGroup.fromJson(jsonDecode(groupStr)));
     } catch (e) {
-      prefs.remove(group);
+      prefs.remove(id);
     }
   }
-
-  // groupList.add(group);
-  // String json = jsonEncode(group);
-  // print(json);
-  // var maps = jsonDecode(json);
-  // for (var map in maps) {
-  //   log(map.toString());
-  // }
-  // apiList[0] = ApiWidgetInfo.fromJson();
 
   EasyLoading.instance
     ..displayDuration = const Duration(milliseconds: 1200)
@@ -87,6 +82,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    print("更新");
     return Scaffold(
       appBar: AppBar(title: Text("${widget.title} API组")),
       drawer: const Drawer(child: SafeArea(child: SizedBox())),
@@ -103,13 +99,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => GroupList(group: group)));
                 },
+                onLongPress: () async {
+                  await showGroupMenu(context, group);
+                  setState(() {});
+                }, // 菜单
               );
             }),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const AddGroupForm()))
+              .push(MaterialPageRoute(builder: (context) => AddGroupForm()))
               .then((value) => setState(() {}));
         },
         tooltip: '添加API组',

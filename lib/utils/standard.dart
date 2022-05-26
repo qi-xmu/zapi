@@ -18,7 +18,7 @@ const double radius = 10;
 const Color lightColor = Colors.black87;
 const Color darkColor = Colors.white70;
 
-const String GroupListKey = 'groupNameList';
+const String GroupListKey = 'GroupListKey';
 
 /* 生成色彩 */
 MaterialColor createMaterialColor(Color color) {

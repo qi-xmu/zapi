@@ -53,8 +53,8 @@ class _ButtonWidget extends State<ButtonWidget> with WidgetAction {
 
   // 动作
   action() async {
-    widget.info.genParam(0); // 生成参数
     showLoading();
+    widget.info.genParam(null); // 生成参数
     var res = await widget.info.action(); // 发送信息
     if (!mounted) return; // DO NOT use BuildContext across asynchronous gaps.
     if (showResult(context, res, response: widget.info.response?[0])) {}
@@ -110,13 +110,13 @@ class InfoGrid extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
       constraints: const BoxConstraints(minWidth: boxSize, minHeight: boxSize),
       child: Column(children: [
-        Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: d / 5 - 3)),
+        Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: d / 5 - 4)),
         Expanded(
             child: Center(
                 child: Text(
           value.toString(),
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: d / 5 + 5),
-        )))
+        ))),
       ]),
     );
   }
@@ -132,39 +132,52 @@ class InfoWidget extends StatefulWidget {
 }
 
 class _InfoWidget extends State<InfoWidget> with WidgetAction {
-  Map<String, dynamic>? info;
+  Map<String, dynamic> state = {};
   bool update = false;
   // 动作
   action() async {
     showLoading();
-    setState(() => update = false);
+    update = false;
     widget.info.genParam(null); // 生成参数
     var res = await widget.info.action(); // 发送信息
     if (!mounted) return;
     if (showResult(context, res, response: widget.info.response![0])) {
-      setState(() {
-        update = true;
-        info = res!.data;
-      });
+      // 解析data;
+      parseData(res!.data);
+      update = true;
+      await updateGroupByContext(context);
     }
+    setState(() {});
     loaded();
+  }
+
+  parseData(Map<String, dynamic> data) {
+    if (widget.info.responseAlias == null) return {state = data};
+
+    data.forEach((key, value) {
+      int index = widget.info.response!.indexOf(key);
+      if (index != -1 && index < widget.info.responseAlias!.length) {
+        String tmp = widget.info.responseAlias![index];
+        state[tmp] = value;
+      }
+    });
+    widget.info.state = state;
   }
 
   @override
   void initState() {
-    update = false;
-    initData(); // info自动加载
+    state = widget.info.state ?? state; // 初始值
+    // actionNoMsg(); // info自动加载
     super.initState();
   }
 
-  initData() async {
+  actionNoMsg() async {
     var res = await widget.info.action(); // 发送信息
     if (!mounted) return;
     if (res != null && res.statusCode! <= 400) {
-      setState(() {
-        update = true;
-        info = res.data;
-      });
+      parseData(res.data);
+      update = true;
+      setState(() {});
     } else {
       showInfoBlock("数据更新失败");
     }
@@ -173,9 +186,8 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
   // 组件
   @override
   Widget build(BuildContext context) {
-    // 生成info的list:
     List<Widget> widgetList = [];
-    info?.forEach((key, value) {
+    state.forEach((key, value) {
       widgetList.add(InfoGrid(name: key, value: value));
     });
     return GestureDetector(
@@ -185,7 +197,7 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
         Column(children: [
           // 状态栏
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            TitleText("名称：${widget.info.apiInfo.name}"),
+            TitleText(widget.info.apiInfo.name),
             Row(children: [
               Icon(
                 update ? Icons.check : Icons.error_outline,
@@ -218,24 +230,40 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
   double percent = 0; // 记录比例
   num value = 0; // 记录值
 
+  @override
+  void initState() {
+    if (widget.info.state != null) {
+      percent = widget.info.state?['percent'] ?? percent; // 初始值
+      value = getValue(percent);
+    }
+    super.initState();
+  }
+
   // 动作
-  action(double state) async {
+  action(double per) async {
     showLoading();
     var param = widget.info.genParam(value); // 生成参数简化
     var res = await widget.info.action(params: param); // 发送信息
 
     if (!mounted) return;
-    if (showResult(context, res, response: widget.info.response?[0])) {}
+    if (showResult(context, res, response: widget.info.response?[0])) {
+      widget.info.state = {'percent': per};
+      await updateGroupByContext(context);
+    }
     loaded();
   }
 
-  onChangedAction(double percent) {
+  getValue(double percent) {
     num min = widget.info.options![0]; // double
     num max = widget.info.options![1]; // double
     num value = min + percent * (max - min);
+    return value;
+  }
+
+  onChangedAction(double per) {
     setState(() {
-      this.value = value;
-      this.percent = percent;
+      percent = per;
+      value = getValue(per);
     });
   }
 
@@ -246,7 +274,7 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
       context,
       Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          TitleText("名称：${widget.info.apiInfo.name}"),
+          TitleText(widget.info.apiInfo.name),
           Text("${(percent * 100).toStringAsFixed(2)}%",
               style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
         ]),
@@ -258,7 +286,13 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
         ]),
         SizedBox(
           height: boxSize,
-          child: Slider(value: percent, max: 1.0, onChanged: onChangedAction, onChangeEnd: action),
+          child: Slider(
+            value: percent,
+            max: 1.0,
+            activeColor: Colors.green,
+            onChanged: onChangedAction,
+            onChangeEnd: action,
+          ),
         )
       ]),
     );
@@ -276,18 +310,29 @@ class SwitchWidget extends StatefulWidget {
 }
 
 class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
-  bool val = false;
+  bool state = false;
+
+  @override
+  void initState() {
+    if (widget.info.state != null) {
+      state = widget.info.state?['state'] ?? state;
+    }
+    super.initState();
+  }
+
   // 动作
-  action(bool state) async {
+  action(bool val) async {
     showLoading();
     var info = widget.info;
-    var param = info.genParam(state);
+    var param = info.genParam(val);
     var res = await info.action(params: param);
 
     // Load end
     if (!mounted) return;
     if (showResult(context, res, response: info.response?[0])) {
-      setState(() => val = state);
+      setState(() => state = val);
+      widget.info.state = {'state': val};
+      await updateGroupByContext(context);
     }
     loaded();
   }
@@ -300,7 +345,7 @@ class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
       constraints: const BoxConstraints(minWidth: boxSize, minHeight: boxSize, maxWidth: boxSize * 2),
       child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         Text(widget.info.apiInfo.name),
-        Switch(value: val, onChanged: action, activeColor: Colors.green),
+        Switch(value: state, onChanged: action, activeColor: Colors.green),
       ]),
     );
   }

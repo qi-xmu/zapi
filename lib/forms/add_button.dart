@@ -58,10 +58,9 @@ class _AddApiForm extends State<AddButtonForm> {
                 labelText: "请求路径",
                 prefixText: '/',
               ),
+              keyboardType: TextInputType.url,
               validator: (v) => v!.trim().isEmpty ? "请求路径不能为空" : null,
-              onChanged: (val) {
-                newAPI.options = ["/$val"];
-              },
+              onChanged: (val) => newAPI.apiInfo.path = "/$val",
             ),
             Row(children: [
               Expanded(
@@ -70,9 +69,8 @@ class _AddApiForm extends State<AddButtonForm> {
                 decoration: const InputDecoration(
                   labelText: "响应参数(可选)",
                 ),
-                onChanged: (val) {
-                  newAPI.response = [val];
-                },
+                onChanged: (val) => newAPI.response = [val],
+                keyboardType: TextInputType.url,
               )),
               const Divider(),
               Expanded(
@@ -81,9 +79,7 @@ class _AddApiForm extends State<AddButtonForm> {
                 decoration: const InputDecoration(
                   labelText: "参数别名(可选)",
                 ),
-                onChanged: (val) {
-                  newAPI.responseAlias = [val];
-                },
+                onChanged: (val) => newAPI.responseAlias = [val],
               ))
             ]),
           ]),

@@ -13,13 +13,14 @@ enum ApiWidgetType {
 class ApiWidgetInfo {
   late String url; // 在加入组别后自动赋值
   ApiWidgetType type; // 类别
-  // ApiGroup group; //所属组别， 身份验证
   APIInfo apiInfo; // api信息
 
   String? control; // 控制参数
   List<dynamic>? options; // 请求选项
-  List<dynamic>? response; // 响应信息
-  List<dynamic>? responseAlias; // 响应别名
+  List<dynamic>? response = []; // 响应信息
+  List<dynamic>? responseAlias = []; // 响应别名
+  // 状态
+  Map<String, dynamic>? state;
 
   ApiWidgetInfo(
     this.type,
@@ -34,6 +35,7 @@ class ApiWidgetInfo {
   ApiWidgetInfo.fromJson(Map<String, dynamic> json)
       : type = ApiWidgetType.values[json['type']],
         url = json['url'],
+        state = json['state'],
         apiInfo = APIInfo.fromJson(json['apiInfo']),
         control = json['control'],
         options = json['options'],
@@ -43,6 +45,7 @@ class ApiWidgetInfo {
   Map<String, dynamic> toJson() => {
         'type': type.index,
         'url': url,
+        'state': state,
         'apiInfo': apiInfo,
         'control': control,
         'options': options,
@@ -56,8 +59,6 @@ class ApiWidgetInfo {
     switch (type) {
       // 按键
       case ApiWidgetType.BUTTON:
-        dynamic option = options![0];
-        apiInfo.path = option;
         break;
       // 开关
       case ApiWidgetType.SWITCH:

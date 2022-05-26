@@ -59,7 +59,7 @@ class _AddSwitchForm extends State<AddSwitchForm> {
                     prefixText: '/',
                   ),
                   validator: (v) => v!.trim().isEmpty ? "请求路径不能为空" : null,
-                  onChanged: (val) => newAPI.options = ["/$val"],
+                  onChanged: (val) => newAPI.apiInfo.path = "/$val",
                 ),
                 TextFormField(
                   textInputAction: TextInputAction.next,
