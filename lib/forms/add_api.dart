@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:zapi/components/API/data_model.dart';
 
 import 'package:zapi/components/APIGroup/data_model.dart';
 import 'package:zapi/components/APIWidget/mod.dart';
+import 'package:zapi/components/DataStorage/mod.dart';
 import 'package:zapi/modals/mod.dart';
 import 'package:select_form_field/select_form_field.dart';
-import 'package:zapi/test.dart';
+
 import 'package:zapi/utils/standard.dart';
 
 import 'api_data.dart';
@@ -23,7 +26,6 @@ class _AddApiForm extends State<AddApiForm> {
 
   ApiWidgetInfo newAPI = ApiWidgetInfo(
     ApiWidgetType.BUTTON,
-    group,
     APIInfo(0, "", HttpMethod.GET, "/"),
   );
 
@@ -131,10 +133,10 @@ class _AddApiForm extends State<AddApiForm> {
         onPressed: () {
           // save
           if (_formKey.currentState!.validate()) {
-            print(newAPI);
-            group.addApi(newAPI);
+            widget.group.addApi(newAPI);
+            prefs.setString(widget.group.name, jsonEncode(widget.group)); // 存储
             showSuccBlock('添加成功');
-            Navigator.pop(context);
+            Navigator.pop(context, newAPI);
           }
         },
         foregroundColor: Colors.white,

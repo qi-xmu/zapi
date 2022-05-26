@@ -11,18 +11,18 @@ enum ApiWidgetType {
 }
 
 class ApiWidgetInfo {
+  late String url; // 在加入组别后自动赋值
   ApiWidgetType type; // 类别
-  ApiGroup group; //所属组别， 身份验证
+  // ApiGroup group; //所属组别， 身份验证
   APIInfo apiInfo; // api信息
 
   String? control; // 控制参数
   List<dynamic>? options; // 请求选项
-  List<String>? response; // 响应信息
-  List<String>? responseAlias; // 响应别名
+  List<dynamic>? response; // 响应信息
+  List<dynamic>? responseAlias; // 响应别名
 
   ApiWidgetInfo(
     this.type,
-    this.group,
     this.apiInfo, {
     this.control,
     this.options,
@@ -30,7 +30,26 @@ class ApiWidgetInfo {
     this.responseAlias,
   });
 
-  /// TODO genParams
+  // 序列化
+  ApiWidgetInfo.fromJson(Map<String, dynamic> json)
+      : type = ApiWidgetType.values[json['type']],
+        url = json['url'],
+        apiInfo = APIInfo.fromJson(json['apiInfo']),
+        control = json['control'],
+        options = json['options'],
+        response = json['response'],
+        responseAlias = json['responseAlias'];
+
+  Map<String, dynamic> toJson() => {
+        'type': type.index,
+        'url': url,
+        'apiInfo': apiInfo,
+        'control': control,
+        'options': options,
+        'response': response,
+        'responseAlias': responseAlias,
+      };
+
   /// 根据类型生成控制
   Map<String, dynamic>? genParam(dynamic state) {
     if (state == null) return {};
@@ -55,9 +74,7 @@ class ApiWidgetInfo {
         return {control ?? "": state.toStringAsFixed(3)};
       // 信息
       case ApiWidgetType.INFO:
-        // TODO: Handle this case.
         break;
-      // TODO: 这里新建一种组件的处理方式
     }
     return {};
   }
@@ -76,7 +93,7 @@ class ApiWidgetInfo {
     Map<String, dynamic>? params,
     Map<String, dynamic>? headers,
   }) async {
-    API api = API(group.url, params: apiInfo.params, headers: apiInfo.headers); // 默认参数
+    API api = API(url, params: apiInfo.params, headers: apiInfo.headers); // 默认参数
     api.setParams(params); // 设置自定义参数
     api.setParams(headers); // 设置自定义头部
     Response? res = await api.send(apiInfo.method, apiInfo.path);
@@ -86,6 +103,6 @@ class ApiWidgetInfo {
 
   @override
   String toString() {
-    return [type, group, apiInfo, control, options, response, responseAlias].toString();
+    return [type, apiInfo, control, options, response, responseAlias].toString();
   }
 }

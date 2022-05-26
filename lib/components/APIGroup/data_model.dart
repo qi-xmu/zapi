@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:zapi/components/API/data_model.dart';
 import 'package:zapi/components/APIWidget/mod.dart';
 
@@ -5,18 +6,33 @@ import 'package:zapi/components/APIWidget/mod.dart';
 /// api组
 /// 组内采用相同的认证
 class ApiGroup {
-  late int id; // 组的id用于数据库的识别
+  int id; // 组的id用于数据库的识别
   String name;
   String url;
+  List<ApiWidgetInfo> widgetList = [];
   // User? _user; // 用户
-  List<dynamic> widgetList = [];
-  // List<ApiWidgetInfo> switchList = [];
-  // List<ApiWidgetInfo> buttonList = [];
-  ApiGroup(this.name, this.url, {User? user}) {
+
+  ApiGroup(this.id, this.name, this.url, {User? user}) {
     id = DateTime.now().millisecondsSinceEpoch;
-    // widgetList.add(switchList);
-    // widgetList.add(buttonList);
   }
+  // 序列化
+  ApiGroup.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'],
+        url = json['url'] {
+    widgetList = [];
+    for (var info in json['widgetList']) {
+      addApi(ApiWidgetInfo.fromJson(info));
+    }
+  }
+  // users
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'url': url,
+        'widgetList': widgetList,
+      };
+
   @override
   String toString() {
     return [id, name, url].toString();
@@ -27,6 +43,7 @@ class ApiGroup {
 
   /// 添加新的api接口
   void addApi(ApiWidgetInfo api) {
+    api.url = url; // 自动加入url
     widgetList.add(api);
   }
 

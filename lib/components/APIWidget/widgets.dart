@@ -230,8 +230,8 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
   }
 
   onChangedAction(double percent) {
-    num min = widget.info.options?[0];
-    num max = widget.info.options?[1];
+    num min = widget.info.options![0]; // double
+    num max = widget.info.options![1]; // double
     num value = min + percent * (max - min);
     setState(() {
       this.value = value;
@@ -256,7 +256,7 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
           Text("当前值： ${value.toStringAsFixed(3)}"),
           Text("最大值：${widget.info.options?[1]}"),
         ]),
-        Container(
+        SizedBox(
           height: boxSize,
           child: Slider(value: percent, max: 1.0, onChanged: onChangedAction, onChangeEnd: action),
         )

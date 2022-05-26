@@ -5,7 +5,10 @@ import 'package:dio/dio.dart';
 // ignore: constant_identifier_names
 enum HttpMethod { GET, POST, PUT, DELETE, PATCH }
 
-/// DOING APIINFO
+/// 这个部分将api分成api和apiinfo两个部分，他们的区别时面向的组不同。
+/// apiinfo 面向 api组件
+/// api面向 发送请求时构建的对象
+
 /// api信息的抽象。api组件包含api info的内容。
 class APIInfo {
   int id;
@@ -28,6 +31,23 @@ class APIInfo {
   String toString() {
     return [id, name, method, path, params, headers].toString();
   }
+
+  APIInfo.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'],
+        path = json['path'],
+        method = HttpMethod.values[json['method']],
+        params = json['params'],
+        headers = json['headers'];
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'method': method.index,
+        'path': path,
+        'params': params,
+        'headers': headers,
+      };
 }
 
 /// DONE API 待完善
@@ -44,7 +64,18 @@ class API {
     _params = params ?? {}; // 非空
   }
 
-  /// TODO token储存
+  /// 这个无需序列化 😅
+  API.fromJson(Map<String, dynamic> json)
+      : url = json['url'],
+        _headers = json['headers'],
+        _params = json['params'];
+
+  Map<String, dynamic> toJson() => {
+        'url': url,
+        'headers': _headers,
+        'params': _params,
+      };
+
   /// 设置token，一个组别一个用户用于api身份的认证。
   set token(String token) {
     _headers?["token"] = token;
