@@ -16,13 +16,15 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initPrefs(); // 初始化存储实例
   /// TESTING
+  // prefs.clear();
+
   group.addApis(apiList);
   await prefs.setString(group.name, jsonEncode(group));
 
-  await prefs.setStringList('groupNameList', [group.name]);
-
+  await prefs.setStringList(GroupListKey, [group.name]);
+  print(prefs.getKeys());
   // 加载group列表 groupList
-  List<String>? groupNameList = prefs.getStringList('groupNameList');
+  List<String>? groupNameList = prefs.getStringList(GroupListKey);
   for (String group in groupNameList!) {
     String? groupStr = prefs.getString(group);
     if (groupStr == null) continue;
@@ -31,7 +33,6 @@ void main() async {
       groupList.add(ApiGroup.fromJson(test));
     } catch (e) {
       prefs.remove(group);
-      print("error");
     }
   }
 
@@ -107,7 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AddGroupForm()));
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => const AddGroupForm()))
+              .then((value) => setState(() {}));
         },
         tooltip: '添加API组',
         child: const Icon(Icons.add),

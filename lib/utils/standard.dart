@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zapi/pages/group_page.dart';
 
 /// 存放一些设计标准。
 
@@ -16,6 +17,8 @@ const double radius = 10;
 
 const Color lightColor = Colors.black87;
 const Color darkColor = Colors.white70;
+
+const String GroupListKey = 'groupNameList';
 
 /* 生成色彩 */
 MaterialColor createMaterialColor(Color color) {

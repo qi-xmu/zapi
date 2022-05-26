@@ -1,27 +1,14 @@
-import 'dart:convert';
+part of AddForm;
 
-import 'package:flutter/material.dart';
-import 'package:zapi/components/API/data_model.dart';
-
-import 'package:zapi/components/APIGroup/data_model.dart';
-import 'package:zapi/components/APIWidget/mod.dart';
-import 'package:zapi/components/DataStorage/mod.dart';
-import 'package:zapi/modals/mod.dart';
-import 'package:select_form_field/select_form_field.dart';
-
-import 'package:zapi/utils/standard.dart';
-
-import 'api_data.dart';
-
-class AddApiForm extends StatefulWidget {
+class AddButtonForm extends StatefulWidget {
   final ApiGroup group;
-  const AddApiForm({Key? key, required this.group}) : super(key: key);
+  const AddButtonForm({Key? key, required this.group}) : super(key: key);
 
   @override
-  State<AddApiForm> createState() => _AddApiForm();
+  State<AddButtonForm> createState() => _AddApiForm();
 }
 
-class _AddApiForm extends State<AddApiForm> {
+class _AddApiForm extends State<AddButtonForm> {
   final _formKey = GlobalKey<FormState>();
 
   ApiWidgetInfo newAPI = ApiWidgetInfo(
@@ -34,24 +21,17 @@ class _AddApiForm extends State<AddApiForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("添加API"),
+        title: const Text("添加按钮"),
       ),
-      body: Container(
-        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+      body: CardContainer(
+        margin: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin * 2),
         padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(radius),
-          boxShadow: [
-            BoxShadow(color: lightColor.withOpacity(0.1), blurRadius: 1, spreadRadius: 2),
-          ],
-        ),
         child: Form(
             key: _formKey,
             child: Column(
               children: [
                 SelectFormField(
-                  icon: const Icon(Icons.http),
+                  autofocus: true,
                   initialValue: '0',
                   labelText: '请求方法',
                   items: httpMethods,
@@ -60,19 +40,6 @@ class _AddApiForm extends State<AddApiForm> {
                     newAPI.apiInfo.method = HttpMethod.values[index];
                   },
                   validator: (v) => v!.trim().isEmpty ? "请求方法不能为空" : null,
-                  onSaved: (val) {},
-                ),
-                SelectFormField(
-                  initialValue: '0',
-                  icon: const Icon(Icons.toys),
-                  labelText: '组件类型',
-                  items: apiWidgetType,
-                  onChanged: (val) {
-                    int index = int.parse(val);
-                    newAPI.type = ApiWidgetType.values[index];
-                  },
-                  validator: (v) => v!.trim().isEmpty ? "组件类型不能为空" : null,
-                  onSaved: (val) => print(val),
                 ),
                 // button
                 TextFormField(
@@ -128,7 +95,6 @@ class _AddApiForm extends State<AddApiForm> {
               ],
             )),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // save
@@ -136,7 +102,7 @@ class _AddApiForm extends State<AddApiForm> {
             widget.group.addApi(newAPI);
             prefs.setString(widget.group.name, jsonEncode(widget.group)); // 存储
             showSuccBlock('添加成功');
-            Navigator.pop(context, newAPI);
+            Navigator.pop(context);
           }
         },
         foregroundColor: Colors.white,
