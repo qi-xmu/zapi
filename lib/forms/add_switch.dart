@@ -10,9 +10,10 @@ class AddSwitchForm extends StatefulWidget {
 
 class _AddSwitchForm extends State<AddSwitchForm> {
   final _formKey = GlobalKey<FormState>();
+  List<String> options = ["", ""];
 
   ApiWidgetInfo newAPI = ApiWidgetInfo(
-    ApiWidgetType.BUTTON,
+    ApiWidgetType.SWITCH,
     APIInfo(0, "", HttpMethod.GET, "/"),
   );
 
@@ -28,11 +29,10 @@ class _AddSwitchForm extends State<AddSwitchForm> {
         padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
         child: Form(
             key: _formKey,
-            child: Column(
+            child: ListView(
               children: [
                 SelectFormField(
                   autofocus: true,
-                  icon: const Icon(Icons.http),
                   initialValue: '0',
                   labelText: '请求方法',
                   items: httpMethods,
@@ -61,38 +61,69 @@ class _AddSwitchForm extends State<AddSwitchForm> {
                   validator: (v) => v!.trim().isEmpty ? "请求路径不能为空" : null,
                   onChanged: (val) => newAPI.options = ["/$val"],
                 ),
-                // getTypeWidget(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        textInputAction: TextInputAction.next,
-                        decoration: const InputDecoration(
-                          labelText: "响应参数(可选)",
-                        ),
-                        onChanged: (val) => newAPI.response = [val],
-                      ),
-                    ),
-                    const Divider(),
-                    Expanded(
-                      child: TextFormField(
-                        textInputAction: TextInputAction.next,
-                        decoration: const InputDecoration(
-                          labelText: "参数别名(可选)",
-                        ),
-                        onChanged: (val) => newAPI.responseAlias = [val],
-                      ),
-                    )
-                  ],
+                TextFormField(
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.alternate_email),
+                    labelText: "开关控制的参数",
+                  ),
+                  validator: (v) => v!.trim().isEmpty ? "不能为空" : null,
+                  onChanged: (val) => newAPI.control = val,
                 ),
+                Row(children: [
+                  Expanded(
+                    child: TextFormField(
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.clear, color: Colors.red),
+                        labelText: "关闭时参数数值",
+                      ),
+                      onChanged: (val) => options[1] = val,
+                      validator: (v) => v!.trim().isEmpty ? "不能为空" : null,
+                    ),
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: TextFormField(
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.check, color: Colors.green),
+                        labelText: "开启时参数数值",
+                      ),
+                      onChanged: (val) => options[0] = val,
+                      validator: (v) => v!.trim().isEmpty ? "不能为空" : null,
+                    ),
+                  )
+                ]),
+                Row(children: [
+                  Expanded(
+                    child: TextFormField(
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: "响应参数(可选)",
+                      ),
+                      onChanged: (val) => newAPI.response = [val],
+                    ),
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: TextFormField(
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: "参数别名(可选)",
+                      ),
+                      onChanged: (val) => newAPI.responseAlias = [val],
+                    ),
+                  )
+                ]),
               ],
             )),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // save
           if (_formKey.currentState!.validate()) {
+            newAPI.options = options;
             widget.group.addApi(newAPI);
             prefs.setString(widget.group.name, jsonEncode(widget.group)); // 存储
             showSuccBlock('添加成功');

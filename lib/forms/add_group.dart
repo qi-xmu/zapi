@@ -36,7 +36,6 @@ class _AddGroupForm extends State<AddGroupForm> {
             child: ListView(
               children: [
                 SelectFormField(
-                  // icon: const Icon(Icons.http),
                   initialValue: prefix,
                   labelText: '协议',
                   items: const [

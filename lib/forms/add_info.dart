@@ -78,7 +78,6 @@ class _AddInfoForm extends State<AddInfoForm> {
                     newAPI.options = ["/$val"];
                   },
                 ),
-                // getTypeWidget(),
                 Row(
                   children: [
                     Expanded(

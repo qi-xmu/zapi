@@ -63,7 +63,7 @@ class _GroupListState extends State<GroupList> {
           label: '添加滑动条',
           onTap: () {
             Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => AddButtonForm(group: widget.group)))
+                .push(MaterialPageRoute(builder: (context) => AddSlidingForm(group: widget.group)))
                 .then((value) => {setState(() {})});
           },
         ),

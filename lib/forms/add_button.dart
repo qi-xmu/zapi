@@ -27,73 +27,67 @@ class _AddApiForm extends State<AddButtonForm> {
         margin: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin * 2),
         padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
         child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SelectFormField(
-                  autofocus: true,
-                  initialValue: '0',
-                  labelText: '请求方法',
-                  items: httpMethods,
-                  onChanged: (val) {
-                    int index = int.parse(val);
-                    newAPI.apiInfo.method = HttpMethod.values[index];
-                  },
-                  validator: (v) => v!.trim().isEmpty ? "请求方法不能为空" : null,
+          key: _formKey,
+          child: ListView(children: [
+            SelectFormField(
+              autofocus: true,
+              initialValue: '0',
+              labelText: '请求方法',
+              items: httpMethods,
+              onChanged: (val) {
+                int index = int.parse(val);
+                newAPI.apiInfo.method = HttpMethod.values[index];
+              },
+              validator: (v) => v!.trim().isEmpty ? "请求方法不能为空" : null,
+            ),
+            // button
+            TextFormField(
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                labelText: "组件名称",
+              ),
+              onChanged: (val) {
+                newAPI.apiInfo.name = val;
+              },
+              validator: (v) => v!.trim().isEmpty ? "组件名称不能为空" : null,
+            ),
+            const Divider(),
+            TextFormField(
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                labelText: "请求路径",
+                prefixText: '/',
+              ),
+              validator: (v) => v!.trim().isEmpty ? "请求路径不能为空" : null,
+              onChanged: (val) {
+                newAPI.options = ["/$val"];
+              },
+            ),
+            Row(children: [
+              Expanded(
+                  child: TextFormField(
+                textInputAction: TextInputAction.next,
+                decoration: const InputDecoration(
+                  labelText: "响应参数(可选)",
                 ),
-                // button
-                TextFormField(
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: "组件名称",
-                  ),
-                  onChanged: (val) {
-                    newAPI.apiInfo.name = val;
-                  },
-                  validator: (v) => v!.trim().isEmpty ? "组件名称不能为空" : null,
+                onChanged: (val) {
+                  newAPI.response = [val];
+                },
+              )),
+              const Divider(),
+              Expanded(
+                  child: TextFormField(
+                textInputAction: TextInputAction.next,
+                decoration: const InputDecoration(
+                  labelText: "参数别名(可选)",
                 ),
-                const Divider(),
-                TextFormField(
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: "请求路径",
-                    prefixText: '/',
-                  ),
-                  validator: (v) => v!.trim().isEmpty ? "请求路径不能为空" : null,
-                  onChanged: (val) {
-                    newAPI.options = ["/$val"];
-                  },
-                ),
-                // getTypeWidget(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        textInputAction: TextInputAction.next,
-                        decoration: const InputDecoration(
-                          labelText: "响应参数(可选)",
-                        ),
-                        onChanged: (val) {
-                          newAPI.response = [val];
-                        },
-                      ),
-                    ),
-                    const Divider(),
-                    Expanded(
-                      child: TextFormField(
-                        textInputAction: TextInputAction.next,
-                        decoration: const InputDecoration(
-                          labelText: "参数别名(可选)",
-                        ),
-                        onChanged: (val) {
-                          newAPI.responseAlias = [val];
-                        },
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            )),
+                onChanged: (val) {
+                  newAPI.responseAlias = [val];
+                },
+              ))
+            ]),
+          ]),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
