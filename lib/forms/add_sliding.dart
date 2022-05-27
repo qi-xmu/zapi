@@ -147,8 +147,8 @@ class _AddSlidingForm extends State<AddSlidingForm> {
           // save
           if (_formKey.currentState!.validate()) {
             _formKey.currentState!.save();
+            newAPI.options = options;
             if (isEdit) {
-              newAPI.options = options;
               Provider.of<GroupListModel>(context, listen: false).modifyWidget(widget.gindex, widget.index!, newAPI);
               showSuccBlock('编辑成功');
             } else {

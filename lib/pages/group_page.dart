@@ -61,7 +61,7 @@ class _GroupListState extends State<GroupList> {
             label: '添加开关',
             onTap: () {
               Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => AddSwitchForm(group: group)))
+                  .push(MaterialPageRoute(builder: (context) => AddSwitchForm(gindex: widget.gindex)))
                   .then((value) => {setState(() {})});
             },
           ),

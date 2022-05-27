@@ -125,11 +125,9 @@ class _AddInfoForm extends State<AddInfoForm> {
           // save
           if (_formKey.currentState!.validate()) {
             _formKey.currentState!.save();
+            newAPI.response = response;
+            newAPI.responseAlias = alias;
             if (isEdit) {
-              newAPI.response = response;
-              newAPI.responseAlias = alias;
-              // newAPI.state = parseData(info.state ?? {}, info.responseAlias, alias);
-
               Provider.of<GroupListModel>(context, listen: false).modifyWidget(widget.gindex, widget.index!, newAPI);
               showSuccBlock('编辑成功');
             } else {

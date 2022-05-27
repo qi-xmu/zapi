@@ -48,7 +48,7 @@ editWidget(BuildContext context, int gindex, int index) {
       break;
     case ApiWidgetType.SWITCH: // 开关
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => AddButtonForm(gindex: gindex, index: index),
+        builder: (context) => AddSwitchForm(gindex: gindex, index: index),
       ));
       break;
   }

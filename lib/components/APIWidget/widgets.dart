@@ -147,6 +147,7 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
     group = context.read<GroupListModel>().getAt(widget.gindex);
     info = group.widgetList[widget.index];
     values = info.state?['0'] ?? []; // 初始值
+    print(values);
     // actionNoMsg(); // info自动加载
     super.initState();
   }
@@ -160,8 +161,9 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
     if (showResult(context, res, response: info.response[0])) {
       // 解析data;
       values = parseData(res!.data, info.response, info.responseAlias);
+      info.state = {'0': values}; // 更新info;
       update = true;
-      //TODO 更新数据
+      updateGroup(group);
     }
     setState(() {});
     loaded();
@@ -248,7 +250,7 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
     if (!mounted) return;
     if (showResult(context, res, response: info.response[0])) {
       info.state = {'0': per};
-      await updateGroupByContext(context);
+      updateGroup(group);
     }
     loaded();
   }
@@ -341,7 +343,7 @@ class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
     if (showResult(context, res, response: info.response[0])) {
       setState(() => state = val);
       info.state = {'0': val};
-      await updateGroupByContext(context);
+      updateGroup(group);
     }
     loaded();
   }
@@ -352,15 +354,18 @@ class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
     group = Provider.of<GroupListModel>(context).getAt(widget.gindex);
     info = group.widgetList[widget.index];
 
-    return widgetContainer(
-      context,
-      Container(
-        width: (MediaQuery.of(context).size.width - 2 * (verMargin + horPadding) - 3 * 17) / 3,
-        constraints: const BoxConstraints(minWidth: boxSize, minHeight: boxSize, maxWidth: boxSize * 2),
-        child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          Text(info.apiInfo.name),
-          Switch(value: state, onChanged: action, activeColor: Colors.green),
-        ]),
+    return GestureDetector(
+      onLongPress: () => showWidgetMenu(context, widget.gindex, widget.index), // 菜单
+      child: widgetContainer(
+        context,
+        Container(
+          width: (MediaQuery.of(context).size.width - 2 * (verMargin + horPadding) - 3 * 17) / 3,
+          constraints: const BoxConstraints(minWidth: boxSize, minHeight: boxSize, maxWidth: boxSize * 2),
+          child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            Text(info.apiInfo.name),
+            Switch(value: state, onChanged: action, activeColor: Colors.green),
+          ]),
+        ),
       ),
     );
   }
