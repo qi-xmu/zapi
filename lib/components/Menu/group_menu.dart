@@ -42,6 +42,7 @@ showGroupMenu(BuildContext context, int index) async {
     context: context,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
     builder: (context) => Container(
+      height: menuHeight,
       padding: const EdgeInsets.symmetric(vertical: verPadding * 2, horizontal: horPadding),
       child: Column(children: [
         const TitleText("菜单"),

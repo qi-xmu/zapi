@@ -18,13 +18,14 @@ import 'package:zapi/test.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initPrefs(); // 初始化存储实例
+  
   /// TESTING
-  prefs.clear();
+  // prefs.clear();
 
-  testGroup.addApis(apiList); // 测试代码
-  await prefs.setString(testGroup.id.toString(), jsonEncode(testGroup));
-  await prefs.setStringList(GroupListKey, [testGroup.id.toString()]);
-  print(prefs.getKeys());
+  // testGroup.addApis(apiList); // 测试代码
+  // await prefs.setString(testGroup.id.toString(), jsonEncode(testGroup));
+  // await prefs.setStringList(GroupListKey, [testGroup.id.toString()]);
+  // print(prefs.getKeys());
 
   ///TESING end
 
@@ -107,9 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => AddGroupForm()))
-              .then((value) => setState(() {}));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AddGroupForm()));
         },
         tooltip: '添加API组',
         child: const Icon(Icons.add),

@@ -1,8 +1,8 @@
 library menu;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:zapi/components/APIGroup/data_model.dart';
+// Import package
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:zapi/components/APIWidget/mod.dart';
 import 'package:zapi/components/DataStorage/mod.dart';
 import 'package:zapi/forms/group_form.dart';

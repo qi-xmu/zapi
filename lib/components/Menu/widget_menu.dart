@@ -67,6 +67,7 @@ showWidgetMenu(BuildContext context, int gindex, int index) async {
     widgetMenu[0]['color'] = darkColor;
     widgetMenu[1]['color'] = darkColor;
   }
+  Vibrate.feedback(FeedbackType.light);
 
   List<Widget> menuList = List.generate(
     groupMenuText.length,
@@ -81,6 +82,7 @@ showWidgetMenu(BuildContext context, int gindex, int index) async {
     context: context,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
     builder: (context) => Container(
+      height: menuHeight,
       padding: const EdgeInsets.symmetric(vertical: verPadding * 2, horizontal: horPadding),
       child: Column(children: [
         const TitleText("菜单"),

@@ -18,6 +18,9 @@ const double radius = 10;
 const Color lightColor = Colors.black87;
 const Color darkColor = Colors.white70;
 
+const double menuHeight = 210;
+
+// ignore: constant_identifier_names
 const String GroupListKey = 'GroupListKey';
 
 /* 生成色彩 */
