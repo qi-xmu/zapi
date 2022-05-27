@@ -1,35 +1,51 @@
-import 'package:dio/dio.dart';
 import 'package:zapi/components/API/data_model.dart';
 import 'package:zapi/components/APIWidget/mod.dart';
 
-/// DOING APIGroup
+// 协议
+enum Protocol { HTTP, HTTPS }
+
+// ignore: constant_identifier_names
+const List<String> ProtoStr = ['http://', 'https://'];
+
 /// api组
 /// 组内采用相同的认证
 class ApiGroup {
   int id; // 组的id用于数据库的识别
-  String name;
   String url;
+  String name;
+  Protocol proto = Protocol.HTTP;
   List<ApiWidgetInfo> widgetList = [];
   // User? _user; // 用户
 
-  ApiGroup(this.id, this.name, this.url, {User? user}) {
+  ApiGroup({
+    this.id = 0,
+    this.name = '',
+    this.url = '',
+    this.proto = Protocol.HTTP,
+    User? user,
+  }) {
     id = DateTime.now().millisecondsSinceEpoch;
   }
   // 序列化
   ApiGroup.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         name = json['name'],
+        proto = Protocol.values[json['proto']],
         url = json['url'] {
     widgetList = [];
     for (var info in json['widgetList']) {
       addApi(ApiWidgetInfo.fromJson(info));
     }
   }
+  // 定义URL;
+  String get realUrl => ProtoStr[proto.index] + url;
+
   // users
   Map<String, dynamic> toJson() => {
         'id': id,
-        'name': name,
         'url': url,
+        'name': name,
+        'proto': proto.index,
         'widgetList': widgetList,
       };
 
@@ -43,7 +59,6 @@ class ApiGroup {
 
   /// 添加新的api接口
   void addApi(ApiWidgetInfo api) {
-    api.url = url; // 自动加入url
     widgetList.add(api);
   }
 

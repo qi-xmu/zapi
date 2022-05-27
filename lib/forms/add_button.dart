@@ -12,8 +12,8 @@ class _AddApiForm extends State<AddButtonForm> {
   final _formKey = GlobalKey<FormState>();
 
   ApiWidgetInfo newAPI = ApiWidgetInfo(
-    ApiWidgetType.BUTTON,
-    APIInfo(0, "", HttpMethod.GET, "/"),
+    type: ApiWidgetType.BUTTON,
+    apiInfo: APIInfo(0, "", HttpMethod.GET, "/"),
   );
 
   ApiWidgetType newType = ApiWidgetType.BUTTON;

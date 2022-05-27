@@ -12,8 +12,8 @@ class _AddSlidingForm extends State<AddSlidingForm> {
   final _formKey = GlobalKey<FormState>();
   List<int> options = [0, 0];
   ApiWidgetInfo newAPI = ApiWidgetInfo(
-    ApiWidgetType.SLIDING,
-    APIInfo(0, "", HttpMethod.GET, "/"),
+    type: ApiWidgetType.SLIDING,
+    apiInfo: APIInfo(0, "", HttpMethod.GET, "/"),
     options: [0, 100],
   );
 

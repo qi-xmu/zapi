@@ -13,8 +13,8 @@ class _AddSwitchForm extends State<AddSwitchForm> {
   List<String> options = ["", ""];
 
   ApiWidgetInfo newAPI = ApiWidgetInfo(
-    ApiWidgetType.SWITCH,
-    APIInfo(0, "", HttpMethod.GET, "/"),
+    type: ApiWidgetType.SWITCH,
+    apiInfo: APIInfo(0, "", HttpMethod.GET, "/"),
   );
 
   ApiWidgetType newType = ApiWidgetType.BUTTON;

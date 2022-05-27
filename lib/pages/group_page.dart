@@ -20,7 +20,8 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   @override
   Widget build(BuildContext context) {
-    List<Widget> widgetList = [];
+    List<Widget> widgetList = []; // DOING
+
     for (var awi in widget.group.widgetList) {
       widgetList.add(ApiWidget(info: awi));
     }
@@ -34,58 +35,52 @@ class _GroupListState extends State<GroupList> {
             spacing: 10, // horizontal
             children: widgetList,
           )),
-      floatingActionButton: SpeedDial(children: [
-        SpeedDialChild(
-          child: const Icon(Icons.looks_one),
-          backgroundColor: Colors.red,
-          label: '添加按钮',
-          onTap: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => AddButtonForm(group: widget.group)))
-                .then((value) => {setState(() {})});
-          },
-        ),
-        SpeedDialChild(
-          child: const Icon(Icons.looks_two),
-          backgroundColor: Colors.orange,
-          label: '添加开关',
-          onTap: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => AddSwitchForm(group: widget.group)))
-                .then((value) => {setState(() {})});
-          },
-        ),
-        SpeedDialChild(
-          child: const Icon(Icons.looks_3),
-          backgroundColor: Colors.green,
-          label: '添加滑动条',
-          onTap: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => AddSlidingForm(group: widget.group)))
-                .then((value) => {setState(() {})});
-          },
-        ),
-        SpeedDialChild(
-          child: const Icon(Icons.looks_4),
-          backgroundColor: Colors.blue,
-          label: '添加信息展示',
-          onTap: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => AddInfoForm(group: widget.group)))
-                .then((value) => {setState(() {})});
-          },
-        ),
-      ], child: const Icon(Icons.add)),
-
-      // FloatingActionButton(
-      //   onPressed: () {
-      //     Navigator.of(context)
-      //         .push(MaterialPageRoute(builder: (context) => AddApiForm(group: widget.group)))
-      //         .then((value) => {setState(() {})});
-      //   },
-      //   tooltip: '添加API',
-      //   child: const Icon(Icons.add),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: SpeedDial(
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.looks_one),
+            backgroundColor: Colors.red,
+            label: '添加按钮',
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => AddButtonForm(group: widget.group)))
+                  .then((value) => {setState(() {})});
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.looks_two),
+            backgroundColor: Colors.orange,
+            label: '添加开关',
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => AddSwitchForm(group: widget.group)))
+                  .then((value) => {setState(() {})});
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.looks_3),
+            backgroundColor: Colors.green,
+            label: '添加滑动条',
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => AddSlidingForm(group: widget.group)))
+                  .then((value) => {setState(() {})});
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.looks_4),
+            backgroundColor: Colors.blue,
+            label: '添加信息展示',
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => AddInfoForm(group: widget.group)))
+                  .then((value) => {setState(() {})});
+            },
+          ),
+        ],
+        spaceBetweenChildren: 15,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

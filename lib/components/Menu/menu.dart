@@ -54,6 +54,7 @@ deleteGroup(BuildContext context, ApiGroup group) {
   groupList.remove(group);
   removeGroup(group); // 更新存储
   showSuccBlock("删除成功");
+
   //
   Navigator.of(context).pop();
 }

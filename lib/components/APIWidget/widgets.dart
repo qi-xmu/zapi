@@ -6,7 +6,7 @@ part of api_widget;
 
 /// 组件路由；
 class ApiWidget extends StatelessWidget {
-  final dynamic info; // list or ApiWidget
+  final ApiWidgetInfo info;
   const ApiWidget({Key? key, required this.info}) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,6 @@ class ApiWidget extends StatelessWidget {
   }
 }
 
-// DOING 修改样式 定义一个组件的Container
 /// 这里可以声明所有组件的容器样式
 Widget widgetContainer(BuildContext context, Widget widget) {
   return CardContainer(
@@ -54,8 +53,13 @@ class _ButtonWidget extends State<ButtonWidget> with WidgetAction {
   // 动作
   action() async {
     showLoading();
+    GroupList? gl = context.findAncestorWidgetOfExactType<GroupList>();
+    if (gl == null) {
+      showInfoBlock("数据错误");
+      return;
+    }
     widget.info.genParam(null); // 生成参数
-    var res = await widget.info.action(); // 发送信息
+    var res = await widget.info.action(url: gl.group.realUrl); // 发送信息
     if (!mounted) return; // DO NOT use BuildContext across asynchronous gaps.
     if (showResult(context, res, response: widget.info.response?[0])) {}
     EasyLoading.dismiss();
@@ -137,9 +141,14 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
   // 动作
   action() async {
     showLoading();
+    GroupList? gl = context.findAncestorWidgetOfExactType<GroupList>();
+    if (gl == null) {
+      showInfoBlock("数据错误");
+      return;
+    }
     update = false;
     widget.info.genParam(null); // 生成参数
-    var res = await widget.info.action(); // 发送信息
+    var res = await widget.info.action(url: gl.group.realUrl); // 发送信息
     if (!mounted) return;
     if (showResult(context, res, response: widget.info.response![0])) {
       // 解析data;
@@ -153,7 +162,6 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
 
   parseData(Map<String, dynamic> data) {
     if (widget.info.responseAlias == null) return {state = data};
-
     data.forEach((key, value) {
       int index = widget.info.response!.indexOf(key);
       if (index != -1 && index < widget.info.responseAlias!.length) {
@@ -172,7 +180,12 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
   }
 
   actionNoMsg() async {
-    var res = await widget.info.action(); // 发送信息
+    GroupList? gl = context.findAncestorWidgetOfExactType<GroupList>();
+    if (gl == null) {
+      showInfoBlock("数据错误");
+      return;
+    }
+    var res = await widget.info.action(url: gl.group.realUrl); // 发送信息
     if (!mounted) return;
     if (res != null && res.statusCode! <= 400) {
       parseData(res.data);
@@ -242,8 +255,13 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
   // 动作
   action(double per) async {
     showLoading();
+    GroupList? gl = context.findAncestorWidgetOfExactType<GroupList>();
+    if (gl == null) {
+      showInfoBlock("数据错误");
+      return;
+    }
     var param = widget.info.genParam(value); // 生成参数简化
-    var res = await widget.info.action(params: param); // 发送信息
+    var res = await widget.info.action(url: gl.group.realUrl, params: param); // 发送信息
 
     if (!mounted) return;
     if (showResult(context, res, response: widget.info.response?[0])) {
@@ -311,7 +329,6 @@ class SwitchWidget extends StatefulWidget {
 
 class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
   bool state = false;
-
   @override
   void initState() {
     if (widget.info.state != null) {
@@ -323,9 +340,14 @@ class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
   // 动作
   action(bool val) async {
     showLoading();
+    GroupList? gl = context.findAncestorWidgetOfExactType<GroupList>();
+    if (gl == null) {
+      showInfoBlock("数据错误");
+      return;
+    }
     var info = widget.info;
     var param = info.genParam(val);
-    var res = await info.action(params: param);
+    var res = await info.action(url: gl.group.realUrl, params: param);
 
     // Load end
     if (!mounted) return;

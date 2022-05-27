@@ -14,8 +14,8 @@ class _AddInfoForm extends State<AddInfoForm> {
   List<String> alias = ['', '', ''];
 
   ApiWidgetInfo newAPI = ApiWidgetInfo(
-    ApiWidgetType.INFO,
-    APIInfo(0, "", HttpMethod.GET, "/"),
+    type: ApiWidgetType.INFO,
+    apiInfo: APIInfo(0, "", HttpMethod.GET, "/"),
   );
 
   ApiWidgetType newType = ApiWidgetType.BUTTON;

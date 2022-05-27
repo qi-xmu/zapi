@@ -17,17 +17,24 @@ class AddGroupForm extends StatefulWidget {
 }
 
 class _AddGroupForm extends State<AddGroupForm> {
-  var newGroup = ApiGroup(0, '', '');
+  var newGroup = ApiGroup();
   final _formKey = GlobalKey<FormState>();
-  String prefix = "http://";
+  String prefix = "";
   bool isEdit = false;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    prefix = ProtoStr[widget.group?.proto.index ?? 0];
     if (widget.group != null) {
       isEdit = true; // 编辑选项
       newGroup = widget.group!;
     }
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("添加API组"),
@@ -58,9 +65,7 @@ class _AddGroupForm extends State<AddGroupForm> {
                   ),
                   onChanged: (val) {
                     newGroup.name = val;
-                  },
-                  onSaved: (val) {
-                    newGroup.name = val ?? '';
+                    print("测试保存val");
                   },
                   validator: (v) => v!.trim().isEmpty ? "API组名称不能为空" : null,
                 ),
@@ -73,7 +78,11 @@ class _AddGroupForm extends State<AddGroupForm> {
                   ),
                   keyboardType: TextInputType.url,
                   onChanged: (val) {
-                    newGroup.url = prefix + val;
+                    newGroup.url = val;
+                  },
+                  onSaved: (val) {
+                    newGroup.url = val ?? '';
+                    print("测试保存");
                   },
                   validator: (v) => v!.trim().isEmpty ? "URL不能为空" : null,
                 ),
@@ -84,7 +93,10 @@ class _AddGroupForm extends State<AddGroupForm> {
         onPressed: () {
           // save
           if (_formKey.currentState!.validate()) {
+            _formKey.currentState!.save();
             if (isEdit) {
+              //添加一些前缀
+              newGroup.url = newGroup.url;
               widget.group = newGroup;
               showSuccBlock('修改成功');
             } else {

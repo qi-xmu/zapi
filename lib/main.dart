@@ -8,37 +8,42 @@ import 'package:zapi/components/DataStorage/mod.dart';
 
 import 'package:zapi/forms/group_form.dart';
 import 'package:zapi/pages/group_page.dart';
-import 'package:zapi/test.dart';
+
 import 'package:zapi/utils/ext_widgets.dart';
 import 'package:zapi/utils/standard.dart';
 import 'components/Menu/mod.dart';
+
+import 'package:zapi/test.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initPrefs(); // 初始化存储实例
   /// TESTING
-  // prefs.clear();
+  prefs.clear();
 
-  // testGroup.addApis(apiList);
-  // await prefs.setString(testGroup.id.toString(), jsonEncode(testGroup));
-
-  // await prefs.setStringList(GroupListKey, [testGroup.id.toString()]);
+  testGroup.addApis(apiList); // 测试代码
+  await prefs.setString(testGroup.id.toString(), jsonEncode(testGroup));
+  await prefs.setStringList(GroupListKey, [testGroup.id.toString()]);
   print(prefs.getKeys());
 
   ///TESING end
 
   // 加载group列表 groupList
   List<String>? groupIDList = prefs.getStringList(GroupListKey);
-  for (String id in groupIDList!) {
-    String? groupStr = prefs.getString(id);
-    // log(groupStr.toString());
-    if (groupStr == null) continue;
-    try {
-      groupList.add(ApiGroup.fromJson(jsonDecode(groupStr)));
-    } catch (e) {
-      prefs.remove(id);
+  if (groupIDList != null) {
+    for (String id in groupIDList) {
+      String? groupStr = prefs.getString(id);
+      // log(groupStr.toString());
+      if (groupStr == null) continue;
+      try {
+        groupList.add(ApiGroup.fromJson(jsonDecode(groupStr)));
+      } catch (e) {
+        prefs.remove(id);
+      }
     }
   }
+  // test;
+  // groupList.add(testGroup);
 
   EasyLoading.instance
     ..displayDuration = const Duration(milliseconds: 1200)
@@ -95,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ApiGroup group = groupList[i];
               return ListTile(
                 title: Text(group.name),
-                subtitle: Text(group.url),
+                subtitle: Text(group.realUrl),
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => GroupList(group: group)));
                 },

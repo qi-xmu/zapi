@@ -11,30 +11,32 @@ enum ApiWidgetType {
 }
 
 class ApiWidgetInfo {
-  late String url; // 在加入组别后自动赋值
+  late String id; // 在加入组别后自动赋值
   ApiWidgetType type; // 类别
   APIInfo apiInfo; // api信息
 
   String? control; // 控制参数
   List<dynamic>? options; // 请求选项
-  List<dynamic>? response = []; // 响应信息
-  List<dynamic>? responseAlias = []; // 响应别名
+  List<dynamic>? response; // 响应信息
+  List<dynamic>? responseAlias; // 响应别名
   // 状态
   Map<String, dynamic>? state;
 
-  ApiWidgetInfo(
-    this.type,
-    this.apiInfo, {
+  ApiWidgetInfo({
+    this.type = ApiWidgetType.BUTTON,
+    required this.apiInfo,
     this.control,
     this.options,
     this.response,
     this.responseAlias,
-  });
+  }) {
+    id = DateTime.now().millisecondsSinceEpoch.toString();
+  }
 
   // 序列化
   ApiWidgetInfo.fromJson(Map<String, dynamic> json)
       : type = ApiWidgetType.values[json['type']],
-        url = json['url'],
+        id = json['id'],
         state = json['state'],
         apiInfo = APIInfo.fromJson(json['apiInfo']),
         control = json['control'],
@@ -43,8 +45,8 @@ class ApiWidgetInfo {
         responseAlias = json['responseAlias'];
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'type': type.index,
-        'url': url,
         'state': state,
         'apiInfo': apiInfo,
         'control': control,
@@ -70,7 +72,6 @@ class ApiWidgetInfo {
         return {control ?? "": options![index]};
       // 滑动
       case ApiWidgetType.SLIDING:
-        // DOING: Handle this case. 1~100 == min~max
         if (control == null) return {};
         return {control ?? "": state.toStringAsFixed(3)};
       // 信息
@@ -91,6 +92,7 @@ class ApiWidgetInfo {
 
   // 发送api请求
   Future<Response?> action({
+    required String url,
     Map<String, dynamic>? params,
     Map<String, dynamic>? headers,
   }) async {
