@@ -1,8 +1,13 @@
 part of AddForm;
 
 class AddSlidingForm extends StatefulWidget {
-  final ApiGroup group;
-  const AddSlidingForm({Key? key, required this.group}) : super(key: key);
+  final int gindex;
+  final int? index;
+  const AddSlidingForm({
+    Key? key,
+    required this.gindex,
+    this.index,
+  }) : super(key: key);
 
   @override
   State<AddSlidingForm> createState() => _AddSlidingForm();
@@ -10,14 +15,26 @@ class AddSlidingForm extends StatefulWidget {
 
 class _AddSlidingForm extends State<AddSlidingForm> {
   final _formKey = GlobalKey<FormState>();
-  List<int> options = [0, 0];
-  ApiWidgetInfo newAPI = ApiWidgetInfo(
-    type: ApiWidgetType.SLIDING,
-    apiInfo: APIInfo(),
-    options: [0, 100],
-  );
+  ApiWidgetInfo newAPI = ApiWidgetInfo(type: ApiWidgetType.SLIDING, apiInfo: APIInfo(), options: [0, 100]);
+  List<num> options = [0, 1];
 
-  ApiWidgetType newType = ApiWidgetType.BUTTON;
+  bool isEdit = false;
+
+  late ApiGroup group;
+  late ApiWidgetInfo info;
+
+  @override
+  initState() {
+    group = context.read<GroupListModel>().getAt(widget.gindex);
+    if (widget.index != null) {
+      info = group.widgetList[widget.index!];
+      options[0] = info.options[0];
+      options[1] = info.options[1];
+      isEdit = true;
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,48 +49,44 @@ class _AddSlidingForm extends State<AddSlidingForm> {
           child: ListView(children: [
             SelectFormField(
               autofocus: true,
-              initialValue: '0',
+              initialValue: isEdit ? info.apiInfo.method.index.toString() : '0',
               labelText: '请求方法',
               items: httpMethods,
               onChanged: (val) {
-                int index = int.parse(val);
-                newAPI.apiInfo.method = HttpMethod.values[index];
+                newAPI.apiInfo.method = HttpMethod.values[int.parse(val)];
               },
               validator: (v) => v!.trim().isEmpty ? "请求方法不能为空" : null,
             ),
             TextFormField(
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: "组件名称",
-              ),
-              onChanged: (val) {
-                newAPI.apiInfo.name = val;
-              },
+              initialValue: isEdit ? info.apiInfo.name : null,
+              decoration: const InputDecoration(labelText: "组件名称"),
+              onSaved: (val) => newAPI.apiInfo.name = val ?? '',
               validator: (v) => v!.trim().isEmpty ? "组件名称不能为空" : null,
             ),
             const Divider(),
             TextFormField(
+              keyboardType: TextInputType.url,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: "请求路径",
-                prefixText: '/',
-              ),
-              validator: (v) => v!.trim().isEmpty ? "请求路径不能为空" : null,
-              onChanged: (val) => newAPI.apiInfo.path = "/$val",
+              initialValue: isEdit ? info.apiInfo.path : null,
+              decoration: const InputDecoration(labelText: "请求路径"),
+              onSaved: (val) => newAPI.apiInfo.path = val ?? '',
             ),
             TextFormField(
               textInputAction: TextInputAction.next,
+              initialValue: isEdit ? info.control : null,
               decoration: const InputDecoration(
                 icon: Icon(Icons.alternate_email),
                 labelText: "滑动条控制的参数",
               ),
+              onSaved: (val) => newAPI.control = val,
               validator: (v) => v!.trim().isEmpty ? "不能为空" : null,
-              onChanged: (val) => newAPI.control = val,
             ),
             Row(children: [
               Expanded(
                 child: TextFormField(
                     textInputAction: TextInputAction.next,
+                    initialValue: isEdit ? info.options[0].toString() : null,
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                       LengthLimitingTextInputFormatter(11),
@@ -83,7 +96,7 @@ class _AddSlidingForm extends State<AddSlidingForm> {
                       icon: Icon(Icons.hdr_weak, color: Colors.lightGreen),
                       labelText: "最小值",
                     ),
-                    onChanged: (val) => options[0] = int.parse(val),
+                    onChanged: (val) => options[0] = int.tryParse(val) ?? 0, // on change 比较限制
                     validator: (v) {
                       return v!.trim().isEmpty ? "不能为空" : null;
                     }),
@@ -92,6 +105,7 @@ class _AddSlidingForm extends State<AddSlidingForm> {
               Expanded(
                 child: TextFormField(
                     textInputAction: TextInputAction.next,
+                    initialValue: isEdit ? info.options[1].toString() : null,
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                       LengthLimitingTextInputFormatter(11),
@@ -101,32 +115,28 @@ class _AddSlidingForm extends State<AddSlidingForm> {
                       icon: Icon(Icons.hdr_strong, color: Colors.green),
                       labelText: "最大值",
                     ),
-                    onChanged: (val) => options[1] = int.parse(val),
+                    onChanged: (val) => options[1] = int.tryParse(val) ?? 1,
                     validator: (v) {
-                      if (options[0] >= options[1]) {
-                        return '不能小于最小值';
-                      }
+                      if (options[0] >= options[1]) return '不能小于最小值';
                       return v!.trim().isEmpty ? "不能为空" : null;
                     }),
               )
             ]),
             Row(children: [
               Expanded(
-                  child: TextFormField(
-                textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                  labelText: "响应参数(可选)",
-                ),
-                onChanged: (val) => newAPI.response = [val],
-              )),
-              const Divider(),
+                child: TextFormField(
+                    textInputAction: TextInputAction.next,
+                    initialValue: isEdit ? info.response[0] : null,
+                    decoration: const InputDecoration(labelText: "响应参数(可选)"),
+                    onSaved: (val) => newAPI.response = [val],
+                    keyboardType: TextInputType.url),
+              ),
               Expanded(
                   child: TextFormField(
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                  labelText: "参数别名(可选)",
-                ),
-                onChanged: (val) => newAPI.responseAlias = [val],
+                initialValue: isEdit ? info.responseAlias[0] : null,
+                decoration: const InputDecoration(labelText: "参数别名(可选)"),
+                onSaved: (val) => newAPI.responseAlias = [val],
               ))
             ]),
           ]),
@@ -136,10 +146,15 @@ class _AddSlidingForm extends State<AddSlidingForm> {
         onPressed: () {
           // save
           if (_formKey.currentState!.validate()) {
-            newAPI.options = options;
-            widget.group.addApi(newAPI);
-            prefs.setString(widget.group.name, jsonEncode(widget.group)); // 存储
-            showSuccBlock('添加成功');
+            _formKey.currentState!.save();
+            if (isEdit) {
+              newAPI.options = options;
+              Provider.of<GroupListModel>(context, listen: false).modifyWidget(widget.gindex, widget.index!, newAPI);
+              showSuccBlock('编辑成功');
+            } else {
+              Provider.of<GroupListModel>(context, listen: false).addWidget(widget.gindex, newAPI);
+              showSuccBlock('添加成功');
+            }
             Navigator.pop(context);
           }
         },

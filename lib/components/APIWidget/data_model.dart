@@ -14,7 +14,7 @@ class ApiWidgetInfo {
   APIInfo apiInfo; // api信息
 
   String? control; // 控制参数
-  List<dynamic>? options; // 请求选项
+  List<dynamic> options; // 请求选项
   List<dynamic> response; // 响应信息
   List<dynamic> responseAlias; // 响应别名
   // 状态
@@ -24,7 +24,7 @@ class ApiWidgetInfo {
     this.type = ApiWidgetType.BUTTON,
     required this.apiInfo,
     this.control,
-    this.options,
+    this.options = const [0, 0, 0],
     this.response = const ['', '', ''],
     this.responseAlias = const ['', '', ''],
   }) {
@@ -63,11 +63,8 @@ class ApiWidgetInfo {
       // 开关
       case ApiWidgetType.SWITCH:
         int index = state ? 0 : 1;
-
-        assert(options!.length > index);
-
         if (control == null) break;
-        return {control ?? "": options![index]};
+        return {control ?? "": options[index]};
       // 滑动
       case ApiWidgetType.SLIDING:
         if (control == null) return {};

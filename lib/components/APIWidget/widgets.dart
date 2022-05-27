@@ -254,8 +254,8 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
   }
 
   getValue(double percent) {
-    num min = info.options![0]; // double
-    num max = info.options![1]; // double
+    num min = info.options[0]; // double
+    num max = info.options[1]; // double
     num value = min + percent * (max - min);
     return value;
   }
@@ -273,32 +273,34 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
     group = Provider.of<GroupListModel>(context).getAt(widget.gindex);
     info = group.widgetList[widget.index];
 
-    return widgetContainer(
-      context,
-      Column(children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          StrongText(info.apiInfo.name),
-          Text("${(percent * 100).toStringAsFixed(2)}%",
-              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-        ]),
-        const Divider(),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text("最小值：${info.options?[0]}"),
-          Text("当前值： ${value.toStringAsFixed(3)}"),
-          Text("最大值：${info.options?[1]}"),
-        ]),
-        SizedBox(
-          height: boxSize,
-          child: Slider(
-            value: percent,
-            max: 1.0,
-            activeColor: Colors.green,
-            onChanged: onChangedAction,
-            onChangeEnd: action,
-          ),
-        )
-      ]),
-    );
+    return GestureDetector(
+        onLongPress: () => showWidgetMenu(context, widget.gindex, widget.index), // 菜单
+        child: widgetContainer(
+          context,
+          Column(children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              StrongText(info.apiInfo.name),
+              Text("${(percent * 100).toStringAsFixed(2)}%",
+                  style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+            ]),
+            const Divider(),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Text("最小值：${info.options[0]}"),
+              Text("当前值： ${value.toStringAsFixed(3)}"),
+              Text("最大值：${info.options[1]}"),
+            ]),
+            SizedBox(
+              height: boxSize,
+              child: Slider(
+                value: percent,
+                max: 1.0,
+                activeColor: Colors.green,
+                onChanged: onChangedAction,
+                onChangeEnd: action,
+              ),
+            )
+          ]),
+        ));
   }
 }
 

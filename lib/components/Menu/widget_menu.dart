@@ -43,7 +43,7 @@ editWidget(BuildContext context, int gindex, int index) {
       break;
     case ApiWidgetType.SLIDING:
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => AddButtonForm(gindex: gindex, index: index),
+        builder: (context) => AddSlidingForm(gindex: gindex, index: index),
       ));
       break;
     case ApiWidgetType.SWITCH: // 开关
