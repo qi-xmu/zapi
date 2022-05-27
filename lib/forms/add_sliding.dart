@@ -13,7 +13,7 @@ class _AddSlidingForm extends State<AddSlidingForm> {
   List<int> options = [0, 0];
   ApiWidgetInfo newAPI = ApiWidgetInfo(
     type: ApiWidgetType.SLIDING,
-    apiInfo: APIInfo(0, "", HttpMethod.GET, "/"),
+    apiInfo: APIInfo(),
     options: [0, 100],
   );
 

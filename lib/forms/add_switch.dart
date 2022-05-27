@@ -14,7 +14,7 @@ class _AddSwitchForm extends State<AddSwitchForm> {
 
   ApiWidgetInfo newAPI = ApiWidgetInfo(
     type: ApiWidgetType.SWITCH,
-    apiInfo: APIInfo(0, "", HttpMethod.GET, "/"),
+    apiInfo: APIInfo(),
   );
 
   ApiWidgetType newType = ApiWidgetType.BUTTON;

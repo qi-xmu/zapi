@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:zapi/components/APIGroup/data_model.dart';
 import 'package:zapi/components/DataStorage/mod.dart';
@@ -7,10 +8,9 @@ import 'package:zapi/modals/mod.dart';
 import 'package:zapi/utils/ext_widgets.dart';
 import 'package:zapi/utils/standard.dart';
 
-// ignore: must_be_immutable
 class AddGroupForm extends StatefulWidget {
-  ApiGroup? group; // 可变
-  AddGroupForm({Key? key, this.group}) : super(key: key);
+  final int? index;
+  const AddGroupForm({Key? key, this.index}) : super(key: key);
 
   @override
   State<AddGroupForm> createState() => _AddGroupForm();
@@ -19,16 +19,19 @@ class AddGroupForm extends StatefulWidget {
 class _AddGroupForm extends State<AddGroupForm> {
   var newGroup = ApiGroup();
   final _formKey = GlobalKey<FormState>();
-  String prefix = "";
+  String prefix = 0.toString();
   bool isEdit = false;
+  late List<ApiGroup> groups;
+  late ApiGroup group;
 
   @override
   void initState() {
-    // TODO: implement initState
-    prefix = ProtoStr[widget.group?.proto.index ?? 0];
-    if (widget.group != null) {
+    groups = Provider.of<GroupListModel>(context, listen: false).list;
+    if (widget.index != null) {
+      group = groups[widget.index!];
+      prefix = group.proto.index.toString();
       isEdit = true; // 编辑选项
-      newGroup = widget.group!;
+      newGroup = group;
     }
     super.initState();
   }
@@ -50,40 +53,32 @@ class _AddGroupForm extends State<AddGroupForm> {
                   initialValue: prefix,
                   labelText: '协议',
                   items: const [
-                    {'label': 'HTTP', 'value': 'http://'},
-                    {'label': 'HTTPS', 'value': 'https://'},
+                    {'label': 'HTTP', 'value': '0'},
+                    {'label': 'HTTPS', 'value': '1'},
                   ],
                   onChanged: (val) => {setState(() => prefix = val)},
+                  onSaved: (val) => {newGroup.proto = Protocol.values[int.parse(val ?? "0")]},
                   validator: (v) => v!.trim().isEmpty ? "请求方法不能为空" : null,
                 ),
                 TextFormField(
                   autofocus: true,
-                  initialValue: isEdit ? widget.group?.name : null,
+                  initialValue: isEdit ? group.name : null,
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
                     labelText: "API组名称",
                   ),
-                  onChanged: (val) {
-                    newGroup.name = val;
-                    print("测试保存val");
-                  },
+                  onSaved: (val) => newGroup.name = val ?? '',
                   validator: (v) => v!.trim().isEmpty ? "API组名称不能为空" : null,
                 ),
                 TextFormField(
                   textInputAction: TextInputAction.next,
-                  initialValue: isEdit ? widget.group?.url : null,
+                  initialValue: isEdit ? group.url : null,
                   decoration: InputDecoration(
                     labelText: "URL",
-                    prefixText: prefix,
+                    prefixText: ProtoStr[int.parse(prefix)],
                   ),
                   keyboardType: TextInputType.url,
-                  onChanged: (val) {
-                    newGroup.url = val;
-                  },
-                  onSaved: (val) {
-                    newGroup.url = val ?? '';
-                    print("测试保存");
-                  },
+                  onSaved: (val) => newGroup.url = val ?? '',
                   validator: (v) => v!.trim().isEmpty ? "URL不能为空" : null,
                 ),
               ],
@@ -95,15 +90,12 @@ class _AddGroupForm extends State<AddGroupForm> {
           if (_formKey.currentState!.validate()) {
             _formKey.currentState!.save();
             if (isEdit) {
-              //添加一些前缀
-              newGroup.url = newGroup.url;
-              widget.group = newGroup;
+              Provider.of<GroupListModel>(context, listen: false).modify(newGroup, widget.index!);
               showSuccBlock('修改成功');
             } else {
-              groupList.add(newGroup);
+              Provider.of<GroupListModel>(context, listen: false).add(newGroup);
               showSuccBlock('添加成功');
             }
-            updateGroupList(newGroup);
             Navigator.pop(context);
           } else {
             showInfoBlock('操作失败');

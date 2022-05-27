@@ -2,7 +2,8 @@ part of AddForm;
 
 class AddButtonForm extends StatefulWidget {
   final ApiGroup group;
-  const AddButtonForm({Key? key, required this.group}) : super(key: key);
+  final int? index;
+  const AddButtonForm({Key? key, required this.group, this.index}) : super(key: key);
 
   @override
   State<AddButtonForm> createState() => _AddApiForm();
@@ -10,11 +11,19 @@ class AddButtonForm extends StatefulWidget {
 
 class _AddApiForm extends State<AddButtonForm> {
   final _formKey = GlobalKey<FormState>();
+  bool isEdit = false;
 
   ApiWidgetInfo newAPI = ApiWidgetInfo(
     type: ApiWidgetType.BUTTON,
-    apiInfo: APIInfo(0, "", HttpMethod.GET, "/"),
+    apiInfo: APIInfo(),
   );
+  @override
+  initState() {
+    if (widget.index != null) {
+      isEdit = true;
+    }
+    super.initState();
+  }
 
   ApiWidgetType newType = ApiWidgetType.BUTTON;
   @override
@@ -31,7 +40,7 @@ class _AddApiForm extends State<AddButtonForm> {
           child: ListView(children: [
             SelectFormField(
               autofocus: true,
-              initialValue: '0',
+              initialValue: isEdit ? widget.group.widgetList[widget.index!].apiInfo.method.index.toString() : '0',
               labelText: '请求方法',
               items: httpMethods,
               onChanged: (val) {
@@ -43,43 +52,48 @@ class _AddApiForm extends State<AddButtonForm> {
             // button
             TextFormField(
               textInputAction: TextInputAction.next,
+              initialValue: isEdit ? widget.group.widgetList[widget.index!].apiInfo.name : null,
               decoration: const InputDecoration(
                 labelText: "组件名称",
               ),
-              onChanged: (val) {
-                newAPI.apiInfo.name = val;
-              },
+              // onChanged: (val) {
+              //   newAPI.apiInfo.name = val;
+              // },
+              onSaved: (val) => newAPI.apiInfo.name = val ?? '',
               validator: (v) => v!.trim().isEmpty ? "组件名称不能为空" : null,
             ),
             const Divider(),
             TextFormField(
               textInputAction: TextInputAction.next,
+              initialValue: isEdit ? widget.group.widgetList[widget.index!].apiInfo.path.substring(1) : null,
               decoration: const InputDecoration(
                 labelText: "请求路径",
                 prefixText: '/',
               ),
               keyboardType: TextInputType.url,
               validator: (v) => v!.trim().isEmpty ? "请求路径不能为空" : null,
-              onChanged: (val) => newAPI.apiInfo.path = "/$val",
+              onSaved: (val) => newAPI.apiInfo.path = '/${val ?? ''}',
             ),
             Row(children: [
               Expanded(
                   child: TextFormField(
                 textInputAction: TextInputAction.next,
+                initialValue: isEdit ? (widget.group.widgetList[widget.index!].response ?? [null])[0] : null,
                 decoration: const InputDecoration(
                   labelText: "响应参数(可选)",
                 ),
-                onChanged: (val) => newAPI.response = [val],
+                onSaved: (val) => newAPI.response = [val],
                 keyboardType: TextInputType.url,
               )),
               const Divider(),
               Expanded(
                   child: TextFormField(
                 textInputAction: TextInputAction.next,
+                initialValue: isEdit ? (widget.group.widgetList[widget.index!].responseAlias ?? [null])[0] : null,
                 decoration: const InputDecoration(
                   labelText: "参数别名(可选)",
                 ),
-                onChanged: (val) => newAPI.responseAlias = [val],
+                onSaved: (val) => newAPI.responseAlias = [val],
               ))
             ]),
           ]),
@@ -89,9 +103,16 @@ class _AddApiForm extends State<AddButtonForm> {
         onPressed: () {
           // save
           if (_formKey.currentState!.validate()) {
-            widget.group.addApi(newAPI);
-            prefs.setString(widget.group.name, jsonEncode(widget.group)); // 存储
-            showSuccBlock('添加成功');
+            _formKey.currentState!.save();
+            print(newAPI);
+            if (isEdit) {
+              widget.group.widgetList[widget.index!] = newAPI;
+              showSuccBlock('编辑成功');
+            } else {
+              widget.group.addApi(newAPI);
+              showSuccBlock('添加成功');
+            }
+            updateGroup(widget.group);
             Navigator.pop(context);
           }
         },

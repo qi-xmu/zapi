@@ -15,7 +15,7 @@ class _AddInfoForm extends State<AddInfoForm> {
 
   ApiWidgetInfo newAPI = ApiWidgetInfo(
     type: ApiWidgetType.INFO,
-    apiInfo: APIInfo(0, "", HttpMethod.GET, "/"),
+    apiInfo: APIInfo(),
   );
 
   ApiWidgetType newType = ApiWidgetType.BUTTON;
@@ -120,7 +120,7 @@ class _AddInfoForm extends State<AddInfoForm> {
             newAPI.response = response;
             newAPI.responseAlias = alias;
             widget.group.addApi(newAPI);
-            updateGroupList(widget.group); // 存储
+            // updateGroupList(widget.group); // 存储
             showSuccBlock('添加成功');
             Navigator.pop(context);
           }

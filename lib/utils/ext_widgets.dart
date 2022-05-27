@@ -13,9 +13,29 @@ class TitleText extends Text {
   }) : super(
           key: key,
           text,
-          softWrap: false,
+          softWrap: softWrap ?? false,
           style: const TextStyle(
-            fontSize: 15,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        );
+}
+
+class StrongText extends Text {
+  final String text;
+  StrongText(
+    this.text, {
+    Key? key,
+    double? size,
+    Color? color,
+    bool? softWrap,
+  }) : super(
+          key: key,
+          text,
+          softWrap: false,
+          style: TextStyle(
+            fontSize: size,
+            color: color,
             fontWeight: FontWeight.bold,
           ),
         );

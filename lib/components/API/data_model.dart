@@ -11,21 +11,22 @@ enum HttpMethod { GET, POST, PUT, DELETE, PATCH }
 
 /// api信息的抽象。api组件包含api info的内容。
 class APIInfo {
-  int id;
+  late int id;
   String name; // 名字
   String path; // 路径
   HttpMethod method; // 方法
   Map<String, dynamic>? params; // 路径参数
   Map<String, dynamic>? headers; // 头部
 
-  APIInfo(
-    this.id,
-    this.name,
-    this.method,
-    this.path, {
+  APIInfo({
+    this.name = '',
+    this.method = HttpMethod.GET,
+    this.path = '/',
     this.params,
     this.headers,
-  });
+  }) {
+    id = DateTime.now().millisecondsSinceEpoch;
+  }
 
   @override
   String toString() {

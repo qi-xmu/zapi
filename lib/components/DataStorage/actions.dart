@@ -1,21 +1,42 @@
 part of data_storage;
 
+List<String> getIDList(List<ApiGroup> groups) {
+  List<String> res = [];
+  for (ApiGroup group in groups) {
+    res.add(group.id.toString());
+  }
+  return res;
+}
+
+dataLoad() {
+  var groupList = [];
+  List<String>? groupIDList = prefs.getStringList(GroupListKey);
+  if (groupIDList != null) {
+    for (String id in groupIDList) {
+      String? groupStr = prefs.getString(id);
+      // log(groupStr.toString());
+      if (groupStr == null) continue;
+      try {
+        groupList.add(ApiGroup.fromJson(jsonDecode(groupStr)));
+      } catch (e) {
+        prefs.remove(id);
+      }
+    }
+  }
+  return groupList;
+}
+
+/// ***************************************** *********************************/
 Future<void> initPrefs() async {
   prefs = await SharedPreferences.getInstance();
 }
 
-// Future<void> updateGroupList(ApiGroup? group) async {
-//   prefs.setStringList(GroupListKey, getIDList(groupList));
-// }
-
-Future<void> updateGroupList(ApiGroup group) async {
-  prefs.setString(group.id.toString(), jsonEncode(group)); // 存储
-  prefs.setStringList(GroupListKey, getIDList(groupList));
+Future<void> updateGroupList(List<ApiGroup> groups) async {
+  prefs.setStringList(GroupListKey, getIDList(groups));
 }
 
-Future<void> updateGroup(ApiGroup? group) async {
-  if (group == null) return;
-  prefs.setString(group.id.toString(), jsonEncode(group)); // 存储
+Future<void> updateGroup(ApiGroup group) async {
+  prefs.setString(group.id.toString(), jsonEncode(group)); // 存储group
 }
 
 Future<void> updateGroupByContext(BuildContext context) async {
@@ -27,5 +48,9 @@ Future<void> updateGroupByContext(BuildContext context) async {
 
 Future<void> removeGroup(ApiGroup group) async {
   prefs.remove(group.id.toString());
-  prefs.setStringList(GroupListKey, getIDList(groupList));
+  // prefs.setStringList(GroupListKey, getIDList(groupList));
 }
+
+/// ***************************************** *********************************/
+
+
