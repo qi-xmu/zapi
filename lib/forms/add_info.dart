@@ -128,6 +128,8 @@ class _AddInfoForm extends State<AddInfoForm> {
             if (isEdit) {
               newAPI.response = response;
               newAPI.responseAlias = alias;
+              // newAPI.state = parseData(info.state ?? {}, info.responseAlias, alias);
+
               Provider.of<GroupListModel>(context, listen: false).modifyWidget(widget.gindex, widget.index!, newAPI);
               showSuccBlock('编辑成功');
             } else {

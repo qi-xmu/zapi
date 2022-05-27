@@ -67,18 +67,21 @@ class GroupListModel with ChangeNotifier {
   void addWidget(int gindex, ApiWidgetInfo newWidget) {
     ApiGroup group = _groupList[gindex];
     group.addApi(newWidget);
+    updateGroup(_groupList[gindex]);
     notifyListeners();
   }
 
   //modifyWidget
   void modifyWidget(int gindex, int index, ApiWidgetInfo info) {
     _groupList[gindex].widgetList[index] = info;
+    updateGroup(_groupList[gindex]);
     notifyListeners();
   }
 
   // removeWidget
   void removeWidget(int gindex, int index) {
     _groupList[gindex].widgetList.removeAt(index);
+    updateGroup(_groupList[gindex]);
     notifyListeners();
   }
 }

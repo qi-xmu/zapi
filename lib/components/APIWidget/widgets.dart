@@ -139,14 +139,14 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
   late ApiWidgetInfo info;
 
   bool update = false;
-  Map<String, dynamic> state = {};
+  List values = [];
 
   // 动作
   @override
   void initState() {
     group = context.read<GroupListModel>().getAt(widget.gindex);
     info = group.widgetList[widget.index];
-    state = info.state ?? state; // 初始值
+    values = info.state?['0'] ?? []; // 初始值
     // actionNoMsg(); // info自动加载
     super.initState();
   }
@@ -159,10 +159,9 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
     if (!mounted) return;
     if (showResult(context, res, response: info.response[0])) {
       // 解析data;
-      parseData(res!.data, info.response, info.responseAlias);
+      values = parseData(res!.data, info.response, info.responseAlias);
       update = true;
       //TODO 更新数据
-      // await updateGroupByContext(context);
     }
     setState(() {});
     loaded();
@@ -172,7 +171,7 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
     var res = await info.action(url: group.realUrl); // 发送信息
     if (!mounted) return;
     if (res != null && res.statusCode! <= 400) {
-      parseData(res.data, info.response, info.responseAlias);
+      values = parseData(res.data, info.response, info.responseAlias);
       update = true;
       setState(() {});
     } else {
@@ -185,14 +184,11 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
   Widget build(BuildContext context) {
     group = Provider.of<GroupListModel>(context).getAt(widget.gindex);
     info = group.widgetList[widget.index];
-    // state = info.state ?? state;
-    // parseData(, info.response, info.responseAlias);
 
     List<Widget> infoGrids = [];
-    state.forEach((key, value) {
-      infoGrids.add(InfoGrid(name: key, value: value));
-    });
-    print(infoGrids.length);
+    for (var i = 0; i < values.length; i++) {
+      infoGrids.add(InfoGrid(name: info.responseAlias[i], value: values[i]));
+    }
 
     return GestureDetector(
       onTap: action,
@@ -236,7 +232,7 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
     group = context.read<GroupListModel>().getAt(widget.gindex);
     info = group.widgetList[widget.index];
     if (info.state != null) {
-      percent = info.state?['percent'] ?? percent; // 初始值
+      percent = info.state?['0'] ?? percent; // 初始值
       value = getValue(percent);
     }
     super.initState();
@@ -251,7 +247,7 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
 
     if (!mounted) return;
     if (showResult(context, res, response: info.response[0])) {
-      info.state = {'percent': per};
+      info.state = {'0': per};
       await updateGroupByContext(context);
     }
     loaded();
@@ -327,7 +323,7 @@ class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
     group = context.read<GroupListModel>().getAt(widget.gindex);
     info = group.widgetList[widget.index];
     if (info.state != null) {
-      state = info.state?['state'] ?? state;
+      state = info.state?['0'] ?? state;
     }
     super.initState();
   }
@@ -342,7 +338,7 @@ class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
     if (!mounted) return;
     if (showResult(context, res, response: info.response[0])) {
       setState(() => state = val);
-      info.state = {'state': val};
+      info.state = {'0': val};
       await updateGroupByContext(context);
     }
     loaded();
