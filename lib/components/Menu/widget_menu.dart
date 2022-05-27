@@ -21,36 +21,48 @@ List<Map<String, dynamic>> widgetMenu = [
   },
 ];
 
-shareWidget(BuildContext context, ApiGroup group, int index) {
+shareWidget(BuildContext context, int gindex, int index) {
   showInfoBlock("暂时未开放");
   Navigator.of(context).pop();
 }
 
-editWidget(BuildContext context, ApiGroup group, int index) {
-  var info = group.widgetList[index];
-  print(group.toString());
-  dynamic page;
+editWidget(BuildContext context, int gindex, int index) {
+  Navigator.of(context).pop();
+  var info = context.read<GroupListModel>().getAt(gindex).widgetList[index];
+
   switch (info.type) {
     case ApiWidgetType.BUTTON:
-      page = AddButtonForm(group: group, index: index);
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => AddButtonForm(gindex: gindex, index: index),
+      ));
       break;
     case ApiWidgetType.INFO:
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => AddInfoForm(gindex: gindex, index: index),
+      ));
+      break;
     case ApiWidgetType.SLIDING:
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => AddButtonForm(gindex: gindex, index: index),
+      ));
+      break;
     case ApiWidgetType.SWITCH: // 开关
-    default:
-      return const Text("Null");
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => AddButtonForm(gindex: gindex, index: index),
+      ));
+      break;
   }
-  Navigator.of(context).push(MaterialPageRoute(builder: (context) => page));
 }
 
-deleteWidget(BuildContext context, ApiGroup group, int index) {
-  // group.widgetList.removeAt(index);
+deleteWidget(BuildContext context, int gindex, int index) {
   //DOING
-  Provider.of<GroupModel>(context, listen: false).removeAt(0);
-  Navigator.of(context).pop(); // 这个地方需要更新整个列表
+
+  Provider.of<GroupListModel>(context, listen: false).removeWidget(gindex, index);
+  showSuccBlock('删除成功');
+  Navigator.of(context).pop();
 }
 
-showWidgetMenu(BuildContext context, ApiGroup group, int index) async {
+showWidgetMenu(BuildContext context, int gindex, int index) async {
   if (isDarkMode(context)) {
     widgetMenu[0]['color'] = darkColor;
     widgetMenu[1]['color'] = darkColor;
@@ -62,12 +74,12 @@ showWidgetMenu(BuildContext context, ApiGroup group, int index) async {
       text: widgetMenu[i]['label'],
       icon: widgetMenu[i]['icon'],
       color: widgetMenu[i]['color'],
-      onTap: () => widgetMenu[i]['onTap'](context, group, index),
+      onTap: () => widgetMenu[i]['onTap'](context, gindex, index),
     ),
   );
   await showModalBottomSheet(
     context: context,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
     builder: (context) => Container(
       padding: const EdgeInsets.symmetric(vertical: verPadding * 2, horizontal: horPadding),
       child: Column(children: [

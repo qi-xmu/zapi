@@ -40,7 +40,7 @@ showGroupMenu(BuildContext context, int index) async {
   );
   await showModalBottomSheet(
     context: context,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
     builder: (context) => Container(
       padding: const EdgeInsets.symmetric(vertical: verPadding * 2, horizontal: horPadding),
       child: Column(children: [

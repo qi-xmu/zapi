@@ -6,28 +6,21 @@ part of api_widget;
 
 /// 组件路由；
 class ApiWidget extends StatelessWidget {
-  final ApiGroup group;
+  final int gindex;
   final int index;
-  const ApiWidget({Key? key, required this.group, required this.index}) : super(key: key);
+  const ApiWidget({Key? key, required this.gindex, required this.index}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    switch (group.widgetList[index].type) {
+    var info = context.read<GroupListModel>().getAt(gindex).widgetList[index];
+    switch (info.type) {
       case ApiWidgetType.BUTTON:
-        // return Consumer<GroupListModel>(
-        //   builder: (ctx, glm, child) {
-        //     return ElevatedButton(
-        //       onPressed: () => glm.removeGroup(0),
-        //       child: const Text("点击更新"),
-        //     );
-        //   },
-        // );
-        return ButtonWidget(group: group, index: index);
+        return ButtonWidget(gindex: gindex, index: index);
       case ApiWidgetType.INFO:
-        return InfoWidget(group: group, index: index);
+        return InfoWidget(gindex: gindex, index: index);
       case ApiWidgetType.SLIDING:
-        return SlidingWidget(group: group, index: index);
+        return SlidingWidget(gindex: gindex, index: index);
       case ApiWidgetType.SWITCH: // 开关
-        return SwitchWidget(group: group, index: index);
+        return SwitchWidget(gindex: gindex, index: index);
       default:
         return const Text("Null");
     }
@@ -45,26 +38,25 @@ Widget widgetContainer(BuildContext context, Widget widget) {
 /// TODO 各个组件的样式修改。
 /// 按键的组件
 class ButtonWidget extends StatefulWidget {
-  final ApiGroup group;
+  final int gindex;
   final int index;
-  const ButtonWidget({Key? key, required this.group, required this.index}) : super(key: key);
+  const ButtonWidget({Key? key, required this.gindex, required this.index}) : super(key: key);
   @override
   State<ButtonWidget> createState() => _ButtonWidget();
 }
 
 class _ButtonWidget extends State<ButtonWidget> with WidgetAction {
-  // 变量
-  // ...
+  late ApiGroup group;
+  late ApiWidgetInfo info;
 
   // 动作
   action() async {
-    var info = widget.group.widgetList[widget.index];
     showLoading();
 
     info.genParam(null); // 生成参数
-    var res = await info.action(url: widget.group.realUrl); // 发送信息
+    var res = await info.action(url: group.realUrl); // 发送信息
     if (!mounted) return; // DO NOT use BuildContext across asynchronous gaps.
-    if (showResult(context, res, response: info.response?[0])) {}
+    if (showResult(context, res, response: info.response[0])) {}
     EasyLoading.dismiss();
     loaded();
   }
@@ -72,7 +64,8 @@ class _ButtonWidget extends State<ButtonWidget> with WidgetAction {
   // 组件
   @override
   Widget build(BuildContext context) {
-    print('更新build');
+    group = Provider.of<GroupListModel>(context).getAt(widget.gindex);
+    info = group.widgetList[widget.index];
     bool mode = isDarkMode(context);
     return widgetContainer(
         context,
@@ -82,11 +75,7 @@ class _ButtonWidget extends State<ButtonWidget> with WidgetAction {
             constraints: const BoxConstraints(minWidth: boxSize, minHeight: boxSize, maxWidth: boxSize * 2),
             child: ElevatedButton(
               onPressed: action,
-              onLongPress: () async {
-                GroupList? gl = context.findAncestorWidgetOfExactType<GroupList>();
-                (gl == null) ? () {} : await showWidgetMenu(context, widget.group, widget.index);
-                setState(() {});
-              },
+              onLongPress: () => showWidgetMenu(context, widget.gindex, widget.index), // 菜单
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.transparent),
                 foregroundColor: MaterialStateProperty.all(mode ? darkColor : lightColor),
@@ -100,7 +89,7 @@ class _ButtonWidget extends State<ButtonWidget> with WidgetAction {
                 ),
                 fixedSize: MaterialStateProperty.all(const Size(boxSize, boxSize)),
               ),
-              child: Text(widget.group.widgetList[widget.index].apiInfo.name, maxLines: 2),
+              child: Text(info.apiInfo.name, maxLines: 2),
             ),
           ),
         ]));
@@ -137,22 +126,26 @@ class InfoGrid extends StatelessWidget {
 
 /// 信息展示的组件
 class InfoWidget extends StatefulWidget {
-  final ApiGroup group;
+  final int gindex;
   final int index;
-  const InfoWidget({Key? key, required this.group, required this.index}) : super(key: key);
+  const InfoWidget({Key? key, required this.gindex, required this.index}) : super(key: key);
 
   @override
   State<InfoWidget> createState() => _InfoWidget();
 }
 
 class _InfoWidget extends State<InfoWidget> with WidgetAction {
-  Map<String, dynamic> state = {};
-  bool update = false;
+  late ApiGroup group;
   late ApiWidgetInfo info;
+
+  bool update = false;
+  Map<String, dynamic> state = {};
+
   // 动作
   @override
   void initState() {
-    info = widget.group.widgetList[widget.index];
+    group = context.read<GroupListModel>().getAt(widget.gindex);
+    info = group.widgetList[widget.index];
     state = info.state ?? state; // 初始值
     // actionNoMsg(); // info自动加载
     super.initState();
@@ -162,35 +155,24 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
     showLoading();
     update = false;
     info.genParam(null); // 生成参数
-    var res = await info.action(url: widget.group.realUrl); // 发送信息
+    var res = await info.action(url: group.realUrl); // 发送信息
     if (!mounted) return;
-    if (showResult(context, res, response: info.response![0])) {
+    if (showResult(context, res, response: info.response[0])) {
       // 解析data;
-      parseData(res!.data);
+      parseData(res!.data, info.response, info.responseAlias);
       update = true;
-      await updateGroupByContext(context);
+      //TODO 更新数据
+      // await updateGroupByContext(context);
     }
     setState(() {});
     loaded();
   }
 
-  parseData(Map<String, dynamic> data) {
-    if (info.responseAlias == null) return {state = data};
-    data.forEach((key, value) {
-      int index = info.response!.indexOf(key);
-      if (index != -1 && index < info.responseAlias!.length) {
-        String tmp = info.responseAlias![index];
-        state[tmp] = value;
-      }
-    });
-    info.state = state;
-  }
-
   actionNoMsg() async {
-    var res = await info.action(url: widget.group.realUrl); // 发送信息
+    var res = await info.action(url: group.realUrl); // 发送信息
     if (!mounted) return;
     if (res != null && res.statusCode! <= 400) {
-      parseData(res.data);
+      parseData(res.data, info.response, info.responseAlias);
       update = true;
       setState(() {});
     } else {
@@ -201,12 +183,20 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
   // 组件
   @override
   Widget build(BuildContext context) {
-    List<Widget> widgetList = [];
+    group = Provider.of<GroupListModel>(context).getAt(widget.gindex);
+    info = group.widgetList[widget.index];
+    // state = info.state ?? state;
+    // parseData(, info.response, info.responseAlias);
+
+    List<Widget> infoGrids = [];
     state.forEach((key, value) {
-      widgetList.add(InfoGrid(name: key, value: value));
+      infoGrids.add(InfoGrid(name: key, value: value));
     });
+    print(infoGrids.length);
+
     return GestureDetector(
       onTap: action,
+      onLongPress: () => showWidgetMenu(context, widget.gindex, widget.index), // 菜单
       child: widgetContainer(
         context,
         Column(children: [
@@ -218,7 +208,7 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
             ])
           ]),
           const Divider(),
-          Wrap(runSpacing: 10, spacing: verMargin, children: widgetList),
+          Wrap(runSpacing: 10, spacing: verMargin, children: infoGrids),
         ]),
       ),
     );
@@ -227,22 +217,24 @@ class _InfoWidget extends State<InfoWidget> with WidgetAction {
 
 /// 滑动条的组件
 class SlidingWidget extends StatefulWidget {
-  final ApiGroup group;
+  final int gindex;
   final int index;
-  const SlidingWidget({Key? key, required this.group, required this.index}) : super(key: key);
+  const SlidingWidget({Key? key, required this.gindex, required this.index}) : super(key: key);
 
   @override
   State<SlidingWidget> createState() => _SlidingWidget();
 }
 
 class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
+  late ApiGroup group;
+  late ApiWidgetInfo info;
   double percent = 0; // 记录比例
   num value = 0; // 记录值
-  late ApiWidgetInfo info;
 
   @override
   void initState() {
-    info = widget.group.widgetList[widget.index];
+    group = context.read<GroupListModel>().getAt(widget.gindex);
+    info = group.widgetList[widget.index];
     if (info.state != null) {
       percent = info.state?['percent'] ?? percent; // 初始值
       value = getValue(percent);
@@ -253,15 +245,12 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
   // 动作
   action(double per) async {
     showLoading();
-    GroupList? gl = context.findAncestorWidgetOfExactType<GroupList>();
-    if (gl == null) {
-      return showInfoBlock("数据错误");
-    }
+
     var param = info.genParam(value); // 生成参数简化
-    var res = await info.action(url: gl.group.realUrl, params: param); // 发送信息
+    var res = await info.action(url: group.realUrl, params: param); // 发送信息
 
     if (!mounted) return;
-    if (showResult(context, res, response: info.response?[0])) {
+    if (showResult(context, res, response: info.response[0])) {
       info.state = {'percent': per};
       await updateGroupByContext(context);
     }
@@ -285,6 +274,9 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
   // 组件
   @override
   Widget build(BuildContext context) {
+    group = Provider.of<GroupListModel>(context).getAt(widget.gindex);
+    info = group.widgetList[widget.index];
+
     return widgetContainer(
       context,
       Column(children: [
@@ -317,22 +309,23 @@ class _SlidingWidget extends State<SlidingWidget> with WidgetAction {
 /// 开关的组件
 ///
 class SwitchWidget extends StatefulWidget {
-  final ApiGroup group;
+  final int gindex;
   final int index;
-  const SwitchWidget({Key? key, required this.group, required this.index}) : super(key: key);
+  const SwitchWidget({Key? key, required this.gindex, required this.index}) : super(key: key);
 
   @override
   State<SwitchWidget> createState() => _SwitchWidget();
 }
 
 class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
-  bool state = false;
+  late ApiGroup group;
   late ApiWidgetInfo info;
+  bool state = false;
 
   @override
   void initState() {
-    info = widget.group.widgetList[widget.index];
-
+    group = context.read<GroupListModel>().getAt(widget.gindex);
+    info = group.widgetList[widget.index];
     if (info.state != null) {
       state = info.state?['state'] ?? state;
     }
@@ -343,11 +336,11 @@ class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
   action(bool val) async {
     showLoading();
     var param = info.genParam(val);
-    var res = await info.action(url: widget.group.realUrl, params: param);
+    var res = await info.action(url: group.realUrl, params: param);
 
     // Load end
     if (!mounted) return;
-    if (showResult(context, res, response: info.response?[0])) {
+    if (showResult(context, res, response: info.response[0])) {
       setState(() => state = val);
       info.state = {'state': val};
       await updateGroupByContext(context);
@@ -358,6 +351,9 @@ class _SwitchWidget extends State<SwitchWidget> with WidgetAction {
   /// 组件
   @override
   Widget build(BuildContext context) {
+    group = Provider.of<GroupListModel>(context).getAt(widget.gindex);
+    info = group.widgetList[widget.index];
+
     return widgetContainer(
       context,
       Container(

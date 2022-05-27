@@ -40,10 +40,10 @@ Future<void> updateGroup(ApiGroup group) async {
 }
 
 Future<void> updateGroupByContext(BuildContext context) async {
-  ApiGroup? group = context.findAncestorWidgetOfExactType<GroupList>()?.group;
+  // ApiGroup? group = context.findAncestorWidgetOfExactType<GroupList>()?.group;
 
-  if (group == null) return;
-  prefs.setString(group.id.toString(), jsonEncode(group)); // 存储
+  // if (group == null) return;
+  // prefs.setString(group.id.toString(), jsonEncode(group)); // 存储
 }
 
 Future<void> removeGroup(ApiGroup group) async {

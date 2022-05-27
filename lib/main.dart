@@ -20,12 +20,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initPrefs(); // 初始化存储实例
   /// TESTING
-  // prefs.clear();
+  prefs.clear();
 
-  // testGroup.addApis(apiList); // 测试代码
-  // await prefs.setString(testGroup.id.toString(), jsonEncode(testGroup));
-  // await prefs.setStringList(GroupListKey, [testGroup.id.toString()]);
-  // print(prefs.getKeys());
+  testGroup.addApis(apiList); // 测试代码
+  await prefs.setString(testGroup.id.toString(), jsonEncode(testGroup));
+  await prefs.setStringList(GroupListKey, [testGroup.id.toString()]);
+  print(prefs.getKeys());
 
   ///TESING end
 
@@ -95,7 +95,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   title: Text(group.name),
                   subtitle: Text(group.realUrl),
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => GroupList(group: group)));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => GroupList(gindex: i)),
+                    );
                   },
                   onLongPress: () async {
                     await showGroupMenu(context, i);

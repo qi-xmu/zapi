@@ -15,3 +15,17 @@ class WidgetAction {
     return false;
   }
 }
+
+Map<String, dynamic> parseData(Map<String, dynamic> data, List<dynamic> response, List<dynamic> alias) {
+  Map<String, dynamic> state = {};
+  if (alias == ['', '', '']) return data;
+  state = {};
+  data.forEach((key, value) {
+    int index = response.indexOf(key);
+    if (index != -1 && index < alias.length) {
+      String tmp = alias[index];
+      state[tmp] = value;
+    }
+  });
+  return state;
+}
