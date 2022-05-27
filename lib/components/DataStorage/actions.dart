@@ -39,16 +39,8 @@ Future<void> updateGroup(ApiGroup group) async {
   prefs.setString(group.id.toString(), jsonEncode(group)); // 存储group
 }
 
-Future<void> updateGroupByContext(BuildContext context) async {
-  // ApiGroup? group = context.findAncestorWidgetOfExactType<GroupList>()?.group;
-
-  // if (group == null) return;
-  // prefs.setString(group.id.toString(), jsonEncode(group)); // 存储
-}
-
 Future<void> removeGroup(ApiGroup group) async {
   prefs.remove(group.id.toString());
-  // prefs.setStringList(GroupListKey, getIDList(groupList));
 }
 
 /// ***************************************** *********************************/

@@ -40,17 +40,18 @@ class _AddApiForm extends State<AddButtonForm> {
           key: _formKey,
           child: ListView(children: [
             SelectFormField(
-              autofocus: true,
               initialValue: isEdit ? info.apiInfo.method.index.toString() : '0',
               labelText: '请求方法',
               items: httpMethods,
-              onChanged: (val) {
-                newAPI.apiInfo.method = HttpMethod.values[int.parse(val)];
+              onSaved: (val) {
+                if (val == null) newAPI.apiInfo.method = info.apiInfo.method;
+                newAPI.apiInfo.method = HttpMethod.values[int.parse(val ?? '0')];
               },
               validator: (v) => v!.trim().isEmpty ? "请求方法不能为空" : null,
             ),
             // button
             TextFormField(
+              autofocus: true,
               textInputAction: TextInputAction.next,
               initialValue: isEdit ? info.apiInfo.name : null,
               decoration: const InputDecoration(labelText: "组件名称"),

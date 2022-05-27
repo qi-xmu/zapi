@@ -43,18 +43,19 @@ class _AddInfoForm extends State<AddInfoForm> {
           key: _formKey,
           child: ListView(children: [
             SelectFormField(
-              autofocus: true,
               icon: const Icon(Icons.http),
               initialValue: isEdit ? info.apiInfo.method.index.toString() : '0',
               labelText: '请求方法',
               items: httpMethods,
-              onChanged: (val) {
-                newAPI.apiInfo.method = HttpMethod.values[int.parse(val)];
+              onSaved: (val) {
+                if (val == null) newAPI.apiInfo.method = info.apiInfo.method;
+                newAPI.apiInfo.method = HttpMethod.values[int.parse(val ?? '0')];
               },
               validator: (v) => v!.trim().isEmpty ? "请求方法不能为空" : null,
             ),
             // button
             TextFormField(
+              autofocus: true,
               textInputAction: TextInputAction.next,
               initialValue: isEdit ? info.apiInfo.name : null,
               decoration: const InputDecoration(labelText: "组件名称"),
@@ -63,6 +64,7 @@ class _AddInfoForm extends State<AddInfoForm> {
             ),
             const Divider(),
             TextFormField(
+              keyboardType: TextInputType.url,
               textInputAction: TextInputAction.next,
               initialValue: isEdit ? info.apiInfo.path : null,
               decoration: const InputDecoration(labelText: "请求路径"),
@@ -72,6 +74,7 @@ class _AddInfoForm extends State<AddInfoForm> {
             Row(children: [
               Expanded(
                   child: TextFormField(
+                keyboardType: TextInputType.url,
                 textInputAction: TextInputAction.next,
                 initialValue: isEdit ? info.response[0] : null,
                 decoration: const InputDecoration(labelText: "响应参数1"),
@@ -88,6 +91,7 @@ class _AddInfoForm extends State<AddInfoForm> {
             Row(children: [
               Expanded(
                   child: TextFormField(
+                keyboardType: TextInputType.url,
                 textInputAction: TextInputAction.next,
                 initialValue: isEdit ? info.response[1] : null,
                 decoration: const InputDecoration(labelText: "响应参数2"),
@@ -104,6 +108,7 @@ class _AddInfoForm extends State<AddInfoForm> {
             Row(children: [
               Expanded(
                   child: TextFormField(
+                keyboardType: TextInputType.url,
                 textInputAction: TextInputAction.next,
                 initialValue: isEdit ? info.response[2] : null,
                 decoration: const InputDecoration(labelText: "响应参数3"),
