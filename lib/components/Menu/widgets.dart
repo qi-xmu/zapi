@@ -8,13 +8,9 @@ class BottomMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0x00000000),
-      // body: BackdropFilter(filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2), child: const SizedBox()),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [title, content]),
-      ),
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [title, content]),
     );
   }
 }
@@ -29,12 +25,10 @@ class TIconText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CardContainer(
+        width: boxSize,
+        height: boxSize,
         margin: const EdgeInsets.symmetric(vertical: verMargin, horizontal: horMargin),
         padding: const EdgeInsets.symmetric(vertical: verPadding, horizontal: horPadding),
-        constraints: const BoxConstraints(
-          maxHeight: boxSize,
-          maxWidth: boxSize,
-        ),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(radius),
